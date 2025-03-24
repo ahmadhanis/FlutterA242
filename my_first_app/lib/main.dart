@@ -69,11 +69,17 @@ class _MainAppState extends State<MainApp> {
                   SizedBox(
                       width: 100,
                       child: TextField(
+
                         controller: numbctrl,
                       )),
                   ElevatedButton(
+
                       onPressed: calculateMe, child: const Text("+")),
-                  Text(result.toString())
+                  Text(result.toString()),
+                  Container(
+                    height: 100,
+                    color: Colors.red,
+                  )
                 ],
               )
             ],
