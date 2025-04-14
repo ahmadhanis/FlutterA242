@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -8,6 +10,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
@@ -32,6 +35,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   children: [
                     TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: "Your Name",
+                      ),
+                      keyboardType: TextInputType.text,
+                    ),
+                    TextField(
                       controller: emailController,
                       decoration: const InputDecoration(
                         labelText: "Email",
@@ -46,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       obscureText: true,
                     ),
                     TextField(
-                      controller: passwordController,
+                      controller: confirmPasswordController,
                       decoration: const InputDecoration(
                         labelText: "Password",
                       ),
@@ -80,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     SizedBox(
                         width: 400,
                         child: ElevatedButton(
-                          onPressed: registerUser,
+                          onPressed: registerUserDialog,
                           child: const Text("Register"),
                         ))
                   ],
@@ -91,7 +101,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         )));
   }
 
-  void registerUser() {
+  void registerUserDialog() {
+    String name = nameController.text;
     String email = emailController.text;
     String password = passwordController.text;
     String confirmPassword = confirmPasswordController.text;
@@ -99,7 +110,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String university = universityController.text;
     String address = addressController.text;
 
-    if (email.isEmpty ||
+    if (name.isEmpty ||
+        email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty ||
         phone.isEmpty ||
@@ -110,5 +122,69 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ));
       return;
     }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Passwords do not match"),
+      ));
+      return;
+    }
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Register this account?"),
+            content: const Text("Are you sure?"),
+            actions: [
+              TextButton(
+                child: const Text("Ok"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  registerUser();
+                },
+              ),
+              TextButton(
+                child: const Text("Cancel"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+
+  void registerUser() {
+    String name = nameController.text;
+    String email = emailController.text;
+    String password = passwordController.text;
+    String phone = phoneController.text;
+    String university = universityController.text;
+    String address = addressController.text;
+
+    http.post(Uri.parse("http://10.30.2.21/unigo/php/register_user.php"), body: {
+      "name": name,
+      "email": email,
+      "password": password,
+      "phone": phone,
+      "university": university,
+      "address": address,
+    }).then((response) {
+      print(response.body);
+      if (response.statusCode == 200) {
+        var jsondata = json.decode(response.body);
+        if (jsondata['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Success!"),
+          ));
+        } else{
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Failed to register"),
+          ));
+        }
+      }
+    });
   }
 }
