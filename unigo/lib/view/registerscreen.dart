@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:unigo/view/loginscreen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -155,7 +156,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         });
   }
 
-
   void registerUser() {
     String name = nameController.text;
     String email = emailController.text;
@@ -164,14 +164,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String university = universityController.text;
     String address = addressController.text;
 
-    http.post(Uri.parse("http://10.30.2.21/unigo/php/register_user.php"), body: {
-      "name": name,
-      "email": email,
-      "password": password,
-      "phone": phone,
-      "university": university,
-      "address": address,
-    }).then((response) {
+    http.post(Uri.parse("http://10.30.2.76/unigo/php/register_user.php"),
+        body: {
+          "name": name,
+          "email": email,
+          "password": password,
+          "phone": phone,
+          "university": university,
+          "address": address,
+        }).then((response) {
       print(response.body);
       if (response.statusCode == 200) {
         var jsondata = json.decode(response.body);
@@ -179,7 +180,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Success!"),
           ));
-        } else{
+          Navigator.of(context).pop();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Failed to register"),
           ));

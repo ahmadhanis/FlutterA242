@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "226588533435",
+    "firebase_url": "https://esp-firebase-demo-a15c2-default-rtdb.firebaseio.com",
+    "project_id": "esp-firebase-demo-a15c2",
+    "storage_bucket": "esp-firebase-demo-a15c2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226588533435:android:a76432520f880f212e7f9e",
+        "android_client_info": {
+          "package_name": "com.example.dht_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYOMnDOBXZgBlup5Tw1twxWUXh8KXFu5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226588533435:android:b6b349731c7480352e7f9e",
+        "android_client_info": {
+          "package_name": "com.slumberjer.sfarmskte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYOMnDOBXZgBlup5Tw1twxWUXh8KXFu5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

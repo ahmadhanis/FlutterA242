@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unigo/view/loginscreen.dart';
 import 'package:unigo/view/registerscreen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -15,6 +16,12 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text("Main Screen"),
         backgroundColor: Colors.amber.shade900,
+        actions: [IconButton(onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }, icon: const Icon(Icons.login))],
       ),
       body: Center(
         child: Text(
