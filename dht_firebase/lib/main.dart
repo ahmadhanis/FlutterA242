@@ -31,8 +31,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final DatabaseReference dhtRef = FirebaseDatabase.instance.ref("101/dht");
-  final DatabaseReference relayRef = FirebaseDatabase.instance.ref("101/relay");
+  final DatabaseReference dhtRef = FirebaseDatabase.instance.ref("103/dht");
+  final DatabaseReference relayRef = FirebaseDatabase.instance.ref("103/relay/status");
 
   double? temperature;
   double? humidity;
