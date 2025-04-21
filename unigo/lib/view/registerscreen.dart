@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:unigo/myconfig.dart';
 import 'package:unigo/view/loginscreen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -164,7 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String university = universityController.text;
     String address = addressController.text;
 
-    http.post(Uri.parse("http://10.30.2.76/unigo/php/register_user.php"),
+    http.post(Uri.parse("${MyConfig.myurl}/unigo/php/register_user.php"),
         body: {
           "name": name,
           "email": email,

@@ -1,9 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:unigo/model/user.dart';
+import 'package:unigo/myconfig.dart';
 import 'package:unigo/view/mainscreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +17,13 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isChecked = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadCredentials();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +63,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       children: [
                         const Text("Remember Me"),
-                        Checkbox(value: false, onChanged: (value) {}),
+                        Checkbox(
+                            value: isChecked,
+                            onChanged: (value) {
+                              setState(() {
+                                isChecked = value!;
+                              });
+                              String email = emailController.text;
+                              String password = passwordController.text;
+                              if (isChecked) {
+                                if (email.isEmpty && password.isEmpty) {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                    content: Text("Please fill all fields"),
+                                    backgroundColor: Colors.red,
+                                  ));
+                                  isChecked = false;
+                                  return;
+                                }
+                              }
+                              storeCredentials(email, password, isChecked);
+                            }),
                       ],
                     ),
                     ElevatedButton(
@@ -88,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ));
       return;
     }
-    http.post(Uri.parse("http://10.30.2.76/unigo/php/login_user.php"), body: {
+    http.post(Uri.parse("${MyConfig.myurl}/unigo/php/login_user.php"), body: {
       "email": email,
       "password": password,
     }).then((response) {
@@ -108,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.of(context).pop();
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const MainScreen()),
+            MaterialPageRoute(builder: (context) =>  MainScreen(user: user,)),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -118,5 +146,49 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
     });
+  }
+
+  Future<void> storeCredentials(
+      String email, String password, bool isChecked) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (isChecked) {
+      await prefs.setString('email', email);
+      await prefs.setString('pass', password);
+      await prefs.setBool('remember', isChecked);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Pref Stored Success!"),
+        backgroundColor: Colors.green,
+      ));
+    } else {
+      await prefs.remove('email');
+      await prefs.remove('pass');
+      await prefs.remove('remember');
+      emailController.clear();
+      passwordController.clear();
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Pref Removed!"),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> loadCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('email');
+    String? password = prefs.getString('pass');
+    bool? isChecked = prefs.getBool('remember');
+    if (email != null && password != null && isChecked != null) {
+      emailController.text = email;
+      passwordController.text = password;
+      setState(() {
+        this.isChecked = isChecked!;
+      });
+    } else {
+      emailController.clear();
+      passwordController.clear();
+      isChecked = false;
+      setState(() {});
+    }
   }
 }
