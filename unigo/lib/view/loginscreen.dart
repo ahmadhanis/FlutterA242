@@ -5,6 +5,7 @@ import 'package:unigo/model/user.dart';
 import 'package:unigo/myconfig.dart';
 import 'package:unigo/view/mainscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:unigo/view/registerscreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -97,7 +98,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           GestureDetector(
-              onTap: () {}, child: const Text("Register an account?")),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const RegisterScreen()),
+                );
+              },
+              child: const Text("Register an account?")),
           const SizedBox(height: 10),
           GestureDetector(onTap: () {}, child: const Text("Forgot Password?")),
         ],
@@ -136,7 +144,10 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.of(context).pop();
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) =>  MainScreen(user: user,)),
+            MaterialPageRoute(
+                builder: (context) => MainScreen(
+                      user: user,
+                    )),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
