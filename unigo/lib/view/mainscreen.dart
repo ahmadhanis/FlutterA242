@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:unigo/model/user.dart';
 import 'package:unigo/view/loginscreen.dart';
+import 'package:unigo/view/newitemscreen.dart';
 import 'package:unigo/view/registerscreen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -42,10 +43,12 @@ class _MainScreenState extends State<MainScreen> {
               context,
               MaterialPageRoute(builder: (context) => const RegisterScreen()),
             );
-          }else{
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Add new product screen later"),
-          ));
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NewItemScreen(user: widget.user)),
+            );
           }
         },
         backgroundColor: Colors.amber.shade900,

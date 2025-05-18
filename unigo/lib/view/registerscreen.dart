@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:unigo/myconfig.dart';
 import 'package:unigo/view/loginscreen.dart';
@@ -133,6 +132,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String university = universityController.text;
     String address = addressController.text;
 
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Please select an image"),
+      ));
+      return;
+    }
+    if (kIsWeb) {
+      if (webImageBytes == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Please select an image"),
+        ));
+        return;
+      }
+    }
+
     if (name.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
@@ -185,7 +199,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String phone = phoneController.text;
     String university = universityController.text;
     String address = addressController.text;
-
+    String base64Image = base64Encode(_image!.readAsBytesSync());
+    
     http.post(Uri.parse("${MyConfig.myurl}/unigo/php/register_user.php"),
         body: {
           "name": name,
@@ -194,6 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           "phone": phone,
           "university": university,
           "address": address,
+          "image": base64Image,
         }).then((response) {
       print(response.body);
       if (response.statusCode == 200) {
