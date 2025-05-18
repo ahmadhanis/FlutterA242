@@ -16,11 +16,15 @@ $password = sha1($_POST['password']);
 $phone = $_POST['phone'];
 $university = $_POST['university'];
 $address = $_POST['address'];
+$image = base64_decode($_POST['image']);
 
 $sqlinsert="INSERT INTO `tbl_users`(`user_name`, `user_email`, `user_password`, `user_phone`, `user_university`, `user_address`) VALUES ('$name','$email','$password','$phone','$university','$address')";
 
 try{
     if ($conn->query($sqlinsert) === TRUE) {
+        $last_id = $conn->insert_id;
+         $path = "../assets/images/profiles/".$last_id.".png";
+        file_put_contents($path, $image);
         $response = array('status' => 'success', 'data' => null);
         sendJsonResponse($response);
     } else {
