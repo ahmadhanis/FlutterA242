@@ -1,11 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:unigo/model/user.dart';
+import 'package:unigo/myconfig.dart';
 
 class NewItemScreen extends StatefulWidget {
   final User user;
@@ -45,7 +45,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add New Item"),
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.amber.shade900,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -53,7 +53,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
               margin: const EdgeInsets.all(16.0),
               child: Card(
                   child: Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
                           GestureDetector(
@@ -89,7 +89,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
                             maxLines: 5,
                           ),
                           const SizedBox(
-                            height: 10,
+                            height: 15,
                           ),
                           Row(
                             children: [
@@ -98,8 +98,9 @@ class _NewItemScreenState extends State<NewItemScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("Item Status"),
+                                    const Text("Item Status"),
                                     DropdownButton(
+                                      itemHeight: 60,
                                       value: dropdownvalue,
                                       underline: const SizedBox(),
                                       isExpanded: true,
@@ -128,8 +129,9 @@ class _NewItemScreenState extends State<NewItemScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("Item Quantity"),
+                                    const Text("Item Quantity"),
                                     DropdownButton(
+                                      itemHeight: 60,
                                       value: dropdownvalue2,
                                       underline: const SizedBox(),
                                       isExpanded: true,
@@ -158,7 +160,17 @@ class _NewItemScreenState extends State<NewItemScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                                child: Text("Add Item"), onPressed: () {}),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.amber.shade900,
+                                  padding: const EdgeInsets.all(16.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: const Text("Add Item"),
+                                onPressed: () {
+                                  insertItemDialog();
+                                }),
                           )
                         ],
                       )))),
@@ -244,5 +256,93 @@ class _NewItemScreenState extends State<NewItemScreen> {
       _image = File(pickedFile.path);
       setState(() {});
     }
+  }
+
+  void insertItemDialog() {
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select an image"),
+        ),
+      );
+      return;
+    }
+    if (itemController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter item name"),
+        ),
+      );
+      return;
+    }
+    if (descController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter item description"),
+        ),
+      );
+      return;
+    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Are sure?"),
+          content: const Text("Do you want to add this item?"),
+          actions: [
+            TextButton(
+              child: const Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                registerItem();
+              },
+            ),
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void registerItem() {
+    String itemName = itemController.text;
+    String itemDesc = descController.text;
+    String itemStatus = dropdownvalue;
+    String itemQty = dropdownvalue2;
+    String base64Image = base64Encode(_image!.readAsBytesSync());
+    String userId = widget.user.userId.toString();
+
+    http.post(Uri.parse("${MyConfig.myurl}/unigo/php/insert_item.php"), body: {
+      "name": itemName,
+      "description": itemDesc,
+      "status": itemStatus,
+      "quantity": itemQty,
+      "image": base64Image,
+      "userid": userId,
+    }).then((response) {
+      print(response.body);
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Item added successfully"),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Failed to add item"),
+            ),
+          );
+        }
+      }
+    });
   }
 }
