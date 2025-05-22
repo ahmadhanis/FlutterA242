@@ -20,8 +20,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController universityController = TextEditingController();
   TextEditingController addressController = TextEditingController();
+  String university = "UUM";
+  var unilist = [
+    "UUM",
+    "USM",
+    "UIA",
+    "UM",
+    "UTM",
+    "UPM",
+    "UKM",
+    "UITM",
+    "UNIMAS",
+    "UNIMAP",
+    "UTHM",
+    "UCSI",
+    "MMU",
+    "MSU",
+    "INTI",
+    "HELP",
+    "TAYLORS",
+    "SEGI",
+    "KDU",
+  ];
   File? _image;
   Uint8List? webImageBytes;
   @override
@@ -91,13 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       keyboardType: TextInputType.phone,
                     ),
-                    TextField(
-                      controller: universityController,
-                      decoration: const InputDecoration(
-                        labelText: "University",
-                      ),
-                      keyboardType: TextInputType.text,
-                    ),
+                  
                     TextField(
                       controller: addressController,
                       decoration: const InputDecoration(
@@ -108,6 +123,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(
                       height: 16,
+                    ),
+                      SizedBox(
+                      height: 60,
+                      child: DropdownButton(
+                        value: university,
+                        isExpanded: true,
+                        underline: const SizedBox(),
+                        items: unilist.map((String item) {
+                          return DropdownMenuItem(
+                            value: item,
+                            child: Text(item),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            university = newValue!;
+                          });
+                        },
+                      ),
                     ),
                     SizedBox(
                         width: 400,
@@ -129,7 +163,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String password = passwordController.text;
     String confirmPassword = confirmPasswordController.text;
     String phone = phoneController.text;
-    String university = universityController.text;
     String address = addressController.text;
 
     if (_image == null) {
@@ -197,10 +230,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String email = emailController.text;
     String password = passwordController.text;
     String phone = phoneController.text;
-    String university = universityController.text;
+
     String address = addressController.text;
     String base64Image = base64Encode(_image!.readAsBytesSync());
-    
+
     http.post(Uri.parse("${MyConfig.myurl}/unigo/php/register_user.php"),
         body: {
           "name": name,

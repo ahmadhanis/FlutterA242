@@ -20,6 +20,12 @@ class _NewItemScreenState extends State<NewItemScreen> {
   Uint8List? webImageBytes;
   TextEditingController itemController = TextEditingController();
   TextEditingController descController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
+  String delivery = "Postage";
+  var deliveryOptions = [
+    'Postage',
+    'Pickup',
+  ];
   String dropdownvalue = 'New';
   var itemstatus = [
     'New',
@@ -87,6 +93,44 @@ class _NewItemScreenState extends State<NewItemScreen> {
                             ),
                             keyboardType: TextInputType.text,
                             maxLines: 5,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            children: [
+                              Flexible(
+                                  flex: 1,
+                                  child: TextField(
+                                    controller: priceController,
+                                    decoration: const InputDecoration(
+                                      labelText: "Item Price (MYR)",
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                  )),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Flexible(
+                                child: DropdownButton(
+                                  itemHeight: 60,
+                                  value: delivery,
+                                  underline: const SizedBox(),
+                                  isExpanded: true,
+                                  icon: const Icon(Icons.keyboard_arrow_down),
+                                  items: deliveryOptions.map((String items) {
+                                    return DropdownMenuItem(
+                                      value: items,
+                                      child: Text(items),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    delivery = newValue!;
+                                    setState(() {});
+                                  },
+                                ),
+                              )
+                            ],
                           ),
                           const SizedBox(
                             height: 15,
@@ -283,6 +327,14 @@ class _NewItemScreenState extends State<NewItemScreen> {
       );
       return;
     }
+    if (priceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter item price"),
+        ),
+      );
+      return;
+    }
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -316,7 +368,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
     String itemQty = dropdownvalue2;
     String base64Image = base64Encode(_image!.readAsBytesSync());
     String userId = widget.user.userId.toString();
-
+    String itemPrice = priceController.text;
     http.post(Uri.parse("${MyConfig.myurl}/unigo/php/insert_item.php"), body: {
       "name": itemName,
       "description": itemDesc,
@@ -324,6 +376,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
       "quantity": itemQty,
       "image": base64Image,
       "userid": userId,
+      "delivery": delivery,
+      "price": itemPrice,
     }).then((response) {
       print(response.body);
       if (response.statusCode == 200) {
