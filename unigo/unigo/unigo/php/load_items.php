@@ -3,7 +3,13 @@ error_reporting(0);
 header("Access-Control-Allow-Origin: *"); // running as crome app
 include_once("dbconnect.php");
 
-$sqlloaditems= "SELECT * FROM `tbl_items`";
+if (isset($_GET['userid'])){
+    $userid = $_GET['userid'];
+    $sqlloaditems = "SELECT * FROM `tbl_items` WHERE `user_id` = '$userid'";
+}else{
+    $sqlloaditems= "SELECT * FROM `tbl_items`";
+} 
+
 //echo $sqlloaditems;
 $result = $conn->query($sqlloaditems);
 if ( $result->num_rows > 0 ) {
