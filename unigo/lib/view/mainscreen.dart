@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:unigo/model/item.dart';
@@ -168,7 +169,7 @@ class _MainScreenState extends State<MainScreen> {
     http
         .get(Uri.parse("${MyConfig.myurl}/unigo/php/load_items.php"))
         .then((response) {
-      //log(response.body);
+      log(response.body);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['status'] == 'success') {
@@ -198,7 +199,7 @@ class _MainScreenState extends State<MainScreen> {
   void showItemDetails(Item item) {
     final imageUrl =
         "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
-    final phone = "+60194702493" ?? "";
+    final phone = "+6${item.userPhone}" ?? "";
 
     showDialog(
       context: context,
@@ -248,6 +249,8 @@ class _MainScreenState extends State<MainScreen> {
                       item.itemDelivery ?? "N/A"),
                   _buildIconRow(
                       Icons.date_range, "Date", formatDate(item.itemDate)),
+                  _buildIconRow(
+                      Icons.verified_user, "Name", item.userName ?? "No name"),
                   if (phone.isNotEmpty)
                     _buildIconRow(Icons.phone, "Phone", phone),
 
