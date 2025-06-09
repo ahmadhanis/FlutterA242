@@ -38,15 +38,16 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: Colors.amber.shade900,
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
                 if (widget.user.userId != "0") {
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => UserItemScreen(
                               user: widget.user,
                             )),
                   );
+                  loadItems();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -120,6 +121,7 @@ class _MainScreenState extends State<MainScreen> {
                                 Text("Price: RM ${item.itemPrice}"),
                                 Text("Qty: ${item.itemQty}"),
                                 Text("Delivery: ${item.itemDelivery}"),
+                                Text("Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
                                 Text("Date: ${formatDate(item.itemDate)}"),
                               ],
                             ),

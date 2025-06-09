@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,7 @@ import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:unigo/myconfig.dart';
+import 'package:unigo/view/edititemscreen.dart';
 
 class UserItemScreen extends StatefulWidget {
   final User user;
@@ -29,7 +31,7 @@ class _UserItemScreenState extends State<UserItemScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Items'),
+        title: Text('${widget.user.userName.toString()} Items'),
         backgroundColor: Colors.amber.shade900,
       ),
       body: itemList.isEmpty
@@ -89,7 +91,18 @@ class _UserItemScreenState extends State<UserItemScreen> {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 color: Colors.blue,
-                                onPressed: () {},
+                                onPressed: () async {
+                                 await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditItemScreen(
+                                        user: widget.user,
+                                        item: item,
+                                      ),
+                                    ),
+                                  );
+                                  loadUserItems(); // Refresh the item list
+                                },
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete),
@@ -126,7 +139,7 @@ class _UserItemScreenState extends State<UserItemScreen> {
         .get(Uri.parse(
             "${MyConfig.myurl}/unigo/php/load_items.php?userid=$userid"))
         .then((response) {
-      //log(response.body);
+      log(response.body);
       // print(response.body);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);

@@ -18,7 +18,8 @@ if ( isset( $_GET[ 'userid' ] ) ) {
     i.user_id,
     u.user_name, 
     u.user_phone, 
-    u.user_email 
+    u.user_email,
+    u.user_university 
 FROM tbl_items i
 JOIN tbl_users u ON i.user_id = u.user_id WHERE i.user_id = '$userid'
 ORDER BY i.item_date DESC";
@@ -36,7 +37,8 @@ ORDER BY i.item_date DESC";
     i.user_id,
     u.user_name, 
     u.user_phone, 
-    u.user_email 
+    u.user_email,
+    u.user_university 
 FROM tbl_items i
 JOIN tbl_users u ON i.user_id = u.user_id
 ORDER BY i.item_date DESC";

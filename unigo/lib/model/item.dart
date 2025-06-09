@@ -10,6 +10,7 @@ class Item {
   String? itemDate;
   String? userName;
   String? userPhone;
+  String? userUniversity;
 
   Item(
       {this.itemId,
@@ -22,7 +23,8 @@ class Item {
       this.itemDelivery,
       this.itemDate,
       this.userName,
-      this.userPhone});
+      this.userPhone,
+      this.userUniversity});
 
   Item.fromJson(Map<String, dynamic> json) {
     itemId = json['item_id'];
@@ -36,6 +38,7 @@ class Item {
     itemDate = json['item_date'];
     userName = json['user_name'];
     userPhone = json['user_phone'];
+    userUniversity = json['user_university'];
   }
 
   Map<String, dynamic> toJson() {
@@ -51,6 +54,7 @@ class Item {
     data['item_date'] = itemDate;
     data['user_name'] = userName;
     data['user_phone'] = userPhone;
+    data['university_name'] = userUniversity;
     return data;
   }
 }
