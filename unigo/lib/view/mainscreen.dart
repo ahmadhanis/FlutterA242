@@ -22,6 +22,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   List<Item> itemList = <Item>[]; // List of item objects
+  bool _showSearch = false; // default hidden
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -71,79 +73,113 @@ class _MainScreenState extends State<MainScreen> {
               onPressed: () {
                 loadItems();
               }),
+          IconButton(
+            icon: Icon(_showSearch ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _showSearch = !_showSearch;
+              });
+            },
+          ),
         ],
       ),
       body: itemList.isEmpty
           ? const Center(child: Text("No items found."))
-          : ListView.builder(
-              itemCount: itemList.length,
-              itemBuilder: (context, index) {
-                final item = itemList[index];
-                final imageUrl =
-                    "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  child: InkWell(
-                    splashColor: Colors.red,
-                    onTap: () {
-                      showItemDetails(item);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Image
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: Image.network(
-                              imageUrl,
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.broken_image, size: 80),
-                            ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-                          // Item details (middle column)
-                          Expanded(
-                            child: Column(
+          : Column(
+              children: [
+                Visibility(
+                  visible: _showSearch,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    color: Colors.amber.shade50,
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: "Search items...",
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            // Reset search result if needed
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        // Optionally implement live search here
+                      },
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: itemList.length,
+                    itemBuilder: (context, index) {
+                      final item = itemList[index];
+                      final imageUrl =
+                          "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        child: InkWell(
+                          splashColor: Colors.red,
+                          onTap: () {
+                            showItemDetails(item);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item.itemName ?? "No name",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
-                                Text("Price: RM ${item.itemPrice}"),
-                                Text("Qty: ${item.itemQty}"),
-                                Text("Delivery: ${item.itemDelivery}"),
-                                Text("Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
-                                Text("Date: ${formatDate(item.itemDate)}"),
+                                // Image
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Image.network(
+                                    imageUrl,
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.broken_image,
+                                                size: 80),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                // Item details (middle column)
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(item.itemName ?? "No name",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16)),
+                                      Text("Price: RM ${item.itemPrice}"),
+                                      Text("Qty: ${item.itemQty}"),
+                                      Text("Delivery: ${item.itemDelivery}"),
+                                      Text(
+                                          "Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
+                                      Text(
+                                          "Date: ${formatDate(item.itemDate)}"),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-
-                          // Trailing full-height section (e.g., for buttons or icons)
-                          // Container(
-                          //   height: 80, // same as image height
-                          //   child: Column(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Icon(Icons.edit, color: Colors.blue),
-                          //       Icon(Icons.delete, color: Colors.red),
-                          //     ],
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -250,7 +286,9 @@ class _MainScreenState extends State<MainScreen> {
                   _buildIconRow(Icons.local_shipping, "Delivery",
                       item.itemDelivery ?? "N/A"),
                   _buildIconRow(
-                      Icons.date_range, "Date", formatDate(item.itemDate)),
+                      Icons.school, "University", item.userUniversity ?? "N/A"),
+                  _buildIconRow(Icons.date_range, "Date Posted",
+                      formatDate(item.itemDate)),
                   _buildIconRow(
                       Icons.verified_user, "Name", item.userName ?? "No name"),
                   if (phone.isNotEmpty)
