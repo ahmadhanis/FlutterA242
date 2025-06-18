@@ -7,6 +7,7 @@ import 'package:unigo/model/user.dart';
 import 'package:unigo/myconfig.dart';
 import 'package:unigo/view/loginscreen.dart';
 import 'package:unigo/view/newitemscreen.dart';
+import 'package:unigo/view/profilescreen.dart';
 import 'package:unigo/view/registerscreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:unigo/view/useritemscreen.dart';
@@ -27,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    loadItems();
+    loadItems("all");
   }
 
   @override
@@ -47,7 +48,7 @@ class _MainScreenState extends State<MainScreen> {
                               user: widget.user,
                             )),
                   );
-                  loadItems();
+                  loadItems("all");
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -69,7 +70,12 @@ class _MainScreenState extends State<MainScreen> {
           IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () {
-                loadItems();
+                loadItems("all");
+              }),
+          IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                showSearchDialog();
               }),
         ],
       ),
@@ -121,7 +127,8 @@ class _MainScreenState extends State<MainScreen> {
                                 Text("Price: RM ${item.itemPrice}"),
                                 Text("Qty: ${item.itemQty}"),
                                 Text("Delivery: ${item.itemDelivery}"),
-                                Text("Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
+                                Text(
+                                    "Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
                                 Text("Date: ${formatDate(item.itemDate)}"),
                               ],
                             ),
@@ -158,18 +165,132 @@ class _MainScreenState extends State<MainScreen> {
               MaterialPageRoute(
                   builder: (context) => NewItemScreen(user: widget.user)),
             );
-            loadItems();
+            loadItems("all");
           }
         },
         backgroundColor: Colors.amber.shade900,
         child: const Icon(Icons.add),
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.amber.shade900,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage: widget.user.userId == "0"
+                        ? const AssetImage("assets/images/user.png")
+                        : NetworkImage(
+                            "${MyConfig.myurl}unigo/assets/images/users/user-${widget.user.userId}.png",
+                          ) as ImageProvider<Object>,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.user.userName ?? "Guest",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Home"),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MainScreen(user: widget.user)),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.verified_user),
+              title: const Text("Your Items"),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => UserItemScreen(user: widget.user)),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text("Profile"),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfileScreen(user: widget.user)),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
+              },
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+          onTap: (int index) {
+            // print("Tapped on index $index");
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MainScreen(user: widget.user)),
+              );
+            }
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => UserItemScreen(user: widget.user)),
+              );
+            }
+            if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ProfileScreen(user: widget.user)),
+              );
+            }
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.verified_user),
+              label: "Your Items",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: "Profile",
+            ),
+          ]),
     );
   }
 
-  void loadItems() {
+  void loadItems(String s) {
     http
-        .get(Uri.parse("${MyConfig.myurl}/unigo/php/load_items.php"))
+        .get(Uri.parse("${MyConfig.myurl}/unigo/php/load_items.php?search=$s"))
         .then((response) {
       log(response.body);
       if (response.statusCode == 200) {
@@ -343,5 +464,47 @@ class _MainScreenState extends State<MainScreen> {
   void _launchWhatsApp(String phone) async {
     launchUrlString(
         'https://wa.me/$phone?text=Hello%20I%20am%20interested%20in%20your%20item.');
+  }
+
+  void showSearchDialog() {
+    TextEditingController searchController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Search Items"),
+          content: TextField(
+            controller: searchController,
+            decoration: const InputDecoration(
+              labelText: "Enter item name or keyword",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                String searchTerm = searchController.text.trim();
+                if (searchTerm.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Please enter a search term."),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
+                print(searchTerm);
+                loadItems(searchTerm);
+                Navigator.of(context).pop();
+              },
+              child: const Text("Search"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

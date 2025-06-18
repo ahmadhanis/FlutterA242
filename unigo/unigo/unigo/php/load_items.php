@@ -4,45 +4,92 @@ header( 'Access-Control-Allow-Origin: *' );
 // running as crome app
 include_once( 'dbconnect.php' );
 
-if ( isset( $_GET[ 'userid' ] ) ) {
-    $userid = $_GET[ 'userid' ];
-    $sqlloaditems = "SELECT 
-    i.item_id, 
-    i.item_name, 
-    i.item_desc, 
-    i.item_status, 
-    i.item_price, 
-    i.item_qty, 
-    i.item_delivery, 
-    i.item_date, 
-    i.user_id,
-    u.user_name, 
-    u.user_phone, 
-    u.user_email,
-    u.user_university 
-FROM tbl_items i
-JOIN tbl_users u ON i.user_id = u.user_id WHERE i.user_id = '$userid'
-ORDER BY i.item_date DESC";
+$search = $_GET[ 'search' ];
+if ( $search == "all"){
+    if ( isset( $_GET[ 'userid' ] ) ) {
+        $userid = $_GET[ 'userid' ];
+        $sqlloaditems = "SELECT 
+        i.item_id, 
+        i.item_name, 
+        i.item_desc, 
+        i.item_status, 
+        i.item_price, 
+        i.item_qty, 
+        i.item_delivery, 
+        i.item_date, 
+        i.user_id,
+        u.user_name, 
+        u.user_phone, 
+        u.user_email,
+        u.user_university 
+    FROM tbl_items i
+    JOIN tbl_users u ON i.user_id = u.user_id WHERE i.user_id = '$userid'
+    ORDER BY i.item_date DESC";
 
-} else {
-    $sqlloaditems = "SELECT 
-    i.item_id, 
-    i.item_name, 
-    i.item_desc, 
-    i.item_status, 
-    i.item_price, 
-    i.item_qty, 
-    i.item_delivery, 
-    i.item_date, 
-    i.user_id,
-    u.user_name, 
-    u.user_phone, 
-    u.user_email,
-    u.user_university 
-FROM tbl_items i
-JOIN tbl_users u ON i.user_id = u.user_id
-ORDER BY i.item_date DESC";
+    } else {
+        $sqlloaditems = "SELECT 
+        i.item_id, 
+        i.item_name, 
+        i.item_desc, 
+        i.item_status, 
+        i.item_price, 
+        i.item_qty, 
+        i.item_delivery, 
+        i.item_date, 
+        i.user_id,
+        u.user_name, 
+        u.user_phone, 
+        u.user_email,
+        u.user_university 
+    FROM tbl_items i
+    JOIN tbl_users u ON i.user_id = u.user_id
+    ORDER BY i.item_date DESC";
+    }
 }
+else{
+    if ( isset( $_GET[ 'userid' ] ) ) {
+        $userid = $_GET[ 'userid' ];
+        $sqlloaditems = "SELECT 
+        i.item_id,
+        i.item_name,        
+        i.item_desc,
+        i.item_status,
+        i.item_price,
+        i.item_qty,
+        i.item_delivery,
+        i.item_date,        
+        i.user_id,
+        u.user_name,
+        u.user_phone,
+        u.user_email,
+        u.user_university
+    FROM tbl_items i
+    JOIN tbl_users u ON i.user_id = u.user_id
+    WHERE i.item_name LIKE '%$search%' OR i.item_desc LIKE '%$search%' AND i.user_id = '$userid'
+    ORDER BY i.item_date DESC";
+
+    } else {
+        $sqlloaditems = "SELECT 
+        i.item_id,
+        i.item_name,        
+        i.item_desc,
+        i.item_status,
+        i.item_price,
+        i.item_qty,
+        i.item_delivery,
+        i.item_date,        
+        i.user_id,
+        u.user_name,
+        u.user_phone,
+        u.user_email,
+        u.user_university    
+    FROM tbl_items i    
+    JOIN tbl_users u ON i.user_id = u.user_id
+    WHERE i.item_name LIKE '%$search%' OR i.item_desc LIKE '%$search%'
+    ORDER BY i.item_date DESC";
+    }
+}
+
 
 //echo $sqlloaditems;
 $result = $conn->query( $sqlloaditems );
