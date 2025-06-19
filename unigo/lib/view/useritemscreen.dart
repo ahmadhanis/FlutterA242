@@ -6,7 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
 import 'package:http/http.dart' as http;
-import 'package:unigo/myconfig.dart';
+import 'package:unigo/shared/myconfig.dart';
+import 'package:unigo/shared/mydrawer.dart';
 import 'package:unigo/view/edititemscreen.dart';
 
 class UserItemScreen extends StatefulWidget {
@@ -92,7 +93,7 @@ class _UserItemScreenState extends State<UserItemScreen> {
                                 icon: const Icon(Icons.edit),
                                 color: Colors.blue,
                                 onPressed: () async {
-                                 await Navigator.push(
+                                  await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => EditItemScreen(
@@ -120,6 +121,7 @@ class _UserItemScreenState extends State<UserItemScreen> {
                 );
               },
             ),
+      drawer: MyDrawer(user: widget.user),
     );
   }
 

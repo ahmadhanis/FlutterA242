@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unigo/model/user.dart';
-import 'package:unigo/myconfig.dart';
+import 'package:unigo/shared/myconfig.dart';
 import 'package:unigo/view/mainscreen.dart';
 import 'package:http/http.dart' as http;
 

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
-import 'package:unigo/myconfig.dart';
+import 'package:unigo/shared/myconfig.dart';
 import 'package:http/http.dart' as http;
 
 class EditItemScreen extends StatefulWidget {
@@ -19,223 +19,165 @@ class EditItemScreen extends StatefulWidget {
 }
 
 class _EditItemScreenState extends State<EditItemScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final itemController = TextEditingController();
+  final descController = TextEditingController();
+  final priceController = TextEditingController();
+
   File? _image;
   Uint8List? webImageBytes;
-  TextEditingController itemController = TextEditingController();
-  TextEditingController descController = TextEditingController();
-  TextEditingController priceController = TextEditingController();
+
   String delivery = "Postage";
-  var deliveryOptions = [
-    'Postage',
-    'Pickup',
-  ];
-  String dropdownvalue = 'New';
-  var itemstatus = [
-    'New',
-    'Used',
-    'Refurbished',
-    'Damaged',
-  ];
-  String dropdownvalue2 = '1';
-  var itemqty = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '10',
-  ];
+  String itemStatus = "New";
+  String itemQty = "1";
+
+  final deliveryOptions = ['Postage', 'Pickup'];
+  final itemStatusOptions = ['New', 'Used', 'Refurbished', 'Damaged'];
+  final qtyOptions = List.generate(10, (index) => '${index + 1}');
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    itemController.text = widget.item.itemName.toString();
-    descController.text = widget.item.itemDesc.toString();
-    priceController.text = widget.item.itemPrice.toString();
-    delivery = widget.item.itemDelivery.toString();
-    dropdownvalue = widget.item.itemStatus.toString();
-    dropdownvalue2 = widget.item.itemQty.toString();
+    itemController.text = widget.item.itemName ?? '';
+    descController.text = widget.item.itemDesc ?? '';
+    priceController.text = widget.item.itemPrice ?? '';
+    delivery = widget.item.itemDelivery ?? 'Postage';
+    itemStatus = widget.item.itemStatus ?? 'New';
+    itemQty = widget.item.itemQty ?? '1';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.amber.shade50,
       appBar: AppBar(
         title: const Text("Edit Item"),
         backgroundColor: Colors.amber.shade900,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-              margin: const EdgeInsets.all(16.0),
-              child: Card(
-                  child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showSelectionDialog();
-                            },
-                            child: Container(
-                              height: 200,
-                              width: 400,
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                image: _image != null
-                                    ? FileImage(_image!)
-                                    : NetworkImage(
-                                            "${MyConfig.myurl}unigo/assets/images/items/item-${widget.item.itemId}.png")
-                                        as ImageProvider,
-                                fit: BoxFit.fill,
-                              )),
-                            ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Card(
+          elevation: 6,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: showSelectionDialog,
+                    child: Container(
+                      height: 180,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          image: _image != null
+                              ? FileImage(_image!)
+                              : NetworkImage(
+                                  "${MyConfig.myurl}unigo/assets/images/items/item-${widget.item.itemId}.png",
+                                ) as ImageProvider,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(
+                      itemController, "Item Name", TextInputType.text),
+                  _buildTextField(
+                      descController, "Item Description", TextInputType.text,
+                      maxLines: 4),
+                  _buildTextField(
+                      priceController, "Price (MYR)", TextInputType.number),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: delivery,
+                    decoration: const InputDecoration(
+                      labelText: "Delivery Method",
+                      border: OutlineInputBorder(),
+                    ),
+                    items: deliveryOptions.map((String value) {
+                      return DropdownMenuItem(value: value, child: Text(value));
+                    }).toList(),
+                    onChanged: (val) => setState(() => delivery = val!),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          value: itemStatus,
+                          decoration: const InputDecoration(
+                            labelText: "Item Status",
+                            border: OutlineInputBorder(),
                           ),
-                          TextField(
-                            controller: itemController,
-                            decoration: const InputDecoration(
-                              labelText: "Item Name",
-                            ),
-                            keyboardType: TextInputType.text,
+                          items: itemStatusOptions.map((String value) {
+                            return DropdownMenuItem(
+                                value: value, child: Text(value));
+                          }).toList(),
+                          onChanged: (val) => setState(() => itemStatus = val!),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          value: itemQty,
+                          decoration: const InputDecoration(
+                            labelText: "Quantity",
+                            border: OutlineInputBorder(),
                           ),
-                          TextField(
-                            controller: descController,
-                            decoration: const InputDecoration(
-                              labelText: "Item Description",
-                            ),
-                            keyboardType: TextInputType.text,
-                            maxLines: 5,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Row(
-                            children: [
-                              Flexible(
-                                  flex: 1,
-                                  child: TextField(
-                                    controller: priceController,
-                                    decoration: const InputDecoration(
-                                      labelText: "Item Price (MYR)",
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                  )),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Flexible(
-                                child: DropdownButton(
-                                  itemHeight: 60,
-                                  value: delivery,
-                                  underline: const SizedBox(),
-                                  isExpanded: true,
-                                  icon: const Icon(Icons.keyboard_arrow_down),
-                                  items: deliveryOptions.map((String items) {
-                                    return DropdownMenuItem(
-                                      value: items,
-                                      child: Text(items),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    delivery = newValue!;
-                                    setState(() {});
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Row(
-                            children: [
-                              Flexible(
-                                flex: 2,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("Item Status"),
-                                    DropdownButton(
-                                      itemHeight: 60,
-                                      value: dropdownvalue,
-                                      underline: const SizedBox(),
-                                      isExpanded: true,
-                                      icon:
-                                          const Icon(Icons.keyboard_arrow_down),
-                                      items: itemstatus.map((String items) {
-                                        return DropdownMenuItem(
-                                          value: items,
-                                          child: Text(items),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? newValue) {
-                                        dropdownvalue = newValue!;
-                                        print(dropdownvalue);
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Flexible(
-                                flex: 1,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("Item Quantity"),
-                                    DropdownButton(
-                                      itemHeight: 60,
-                                      value: dropdownvalue2,
-                                      underline: const SizedBox(),
-                                      isExpanded: true,
-                                      icon:
-                                          const Icon(Icons.keyboard_arrow_down),
-                                      items: itemqty.map((String items) {
-                                        return DropdownMenuItem(
-                                          value: items,
-                                          child: Text(items),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? newValue) {
-                                        dropdownvalue2 = newValue!;
-                                        print(dropdownvalue2);
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.amber.shade900,
-                                  padding: const EdgeInsets.all(16.0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: const Text("Update Item"),
-                                onPressed: () {
-                                  updateItemDialog();
-                                }),
-                          )
-                        ],
-                      )))),
+                          items: qtyOptions.map((String value) {
+                            return DropdownMenuItem(
+                                value: value, child: Text(value));
+                          }).toList(),
+                          onChanged: (val) => setState(() => itemQty = val!),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.update),
+                      label: const Text("Update Item"),
+                      onPressed: updateItemDialog,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber.shade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String label, TextInputType type,
+      {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: type,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+        validator: (val) => val!.isEmpty ? "$label is required" : null,
       ),
     );
   }
@@ -243,32 +185,28 @@ class _EditItemScreenState extends State<EditItemScreen> {
   void showSelectionDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-            title: const Text(
-              "Select from",
-              style: TextStyle(),
+      builder: (_) => AlertDialog(
+        title: const Text("Select Image From"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _selectFromCamera();
+              },
+              child: const Text("Camera"),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _selectFromCamera();
-                    },
-                    child: const Text("From Camera")),
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _selectfromGallery();
-                    },
-                    child: const Text("From Gallery"))
-              ],
-            ));
-      },
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _selectFromGallery();
+              },
+              child: const Text("Gallery"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -282,17 +220,12 @@ class _EditItemScreenState extends State<EditItemScreen> {
 
     if (pickedFile != null) {
       _image = File(pickedFile.path);
-      if (kIsWeb) {
-        // Read image bytes for web.
-        webImageBytes = await pickedFile.readAsBytes();
-      }
+      if (kIsWeb) webImageBytes = await pickedFile.readAsBytes();
       setState(() {});
-    } else {
-      print('No image selected.');
     }
   }
 
-  Future<void> _selectfromGallery() async {
+  Future<void> _selectFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
@@ -302,104 +235,78 @@ class _EditItemScreenState extends State<EditItemScreen> {
 
     if (pickedFile != null) {
       _image = File(pickedFile.path);
+      if (kIsWeb) webImageBytes = await pickedFile.readAsBytes();
       setState(() {});
     }
   }
 
   void updateItemDialog() {
-    if (itemController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter item name"),
-        ),
-      );
-      return;
-    }
-    if (descController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter item description"),
-        ),
-      );
-      return;
-    }
-    if (priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter item price"),
-        ),
-      );
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
+
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Are sure?"),
-          content: const Text("Do you want to update this item?"),
-          actions: [
-            TextButton(
-              child: const Text("Yes"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                updateItem();
-              },
-            ),
-            TextButton(
-              child: const Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+      builder: (_) => AlertDialog(
+        title: const Text("Update Item?"),
+        content: const Text("Are you sure you want to save changes?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              updateItem();
+            },
+            child: const Text("Yes"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+        ],
+      ),
     );
   }
 
-  void updateItem() {
-    String base64Image = "NA";
-    String itemName = itemController.text;
-    String itemDesc = descController.text;
-    String itemStatus = dropdownvalue;
-    String itemQty = dropdownvalue2;
-    if (_image == null) {
-      base64Image = "NA";
-    } else {
-      base64Image = base64Encode(_image!.readAsBytesSync());
-    }
+  void updateItem() async {
+    String base64Image =
+        _image != null ? base64Encode(_image!.readAsBytesSync()) : "NA";
 
-    String userId = widget.user.userId.toString();
-    String itemPrice = priceController.text;
-    http.post(Uri.parse("${MyConfig.myurl}/unigo/php/update_item.php"), body: {
-      "itemid": widget.item.itemId.toString(),
-      "name": itemName,
-      "description": itemDesc,
-      "status": itemStatus,
-      "quantity": itemQty,
-      "image": base64Image,
-      "userid": userId,
-      "delivery": delivery,
-      "price": itemPrice,
-    }).then((response) {
-      print(response.body);
-      if (response.statusCode == 200) {
-        var jsonResponse = jsonDecode(response.body);
-        if (jsonResponse['status'] == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Item added successfully"),
-            ),
-          );
-           Navigator.pop(context);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Failed to add item"),
-            ),
-          );
-        }
+    final response = await http.post(
+      Uri.parse("${MyConfig.myurl}/unigo/php/update_item.php"),
+      body: {
+        "itemid": widget.item.itemId.toString(),
+        "name": itemController.text,
+        "description": descController.text,
+        "status": itemStatus,
+        "quantity": itemQty,
+        "image": base64Image,
+        "userid": widget.user.userId.toString(),
+        "delivery": delivery,
+        "price": priceController.text,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      if (jsonResponse['status'] == 'success') {
+        _showSnackbar("Item updated successfully", color: Colors.green);
+        Navigator.pop(context);
+      } else {
+        _showSnackbar("Failed to update item");
       }
-    });
+    } else {
+      _showSnackbar("Server error. Please try again later.");
+    }
+  }
+
+  void _showSnackbar(String message, {Color color = Colors.red}) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    ));
+  }
+
+  ImageProvider _buildItemImage() {
+    return kIsWeb
+        ? MemoryImage(webImageBytes!)
+        : FileImage(_image!) as ImageProvider;
   }
 }

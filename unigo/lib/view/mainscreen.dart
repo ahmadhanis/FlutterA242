@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
-import 'package:unigo/myconfig.dart';
-import 'package:unigo/view/loginscreen.dart';
+import 'package:unigo/shared/myconfig.dart';
+import 'package:unigo/shared/mydrawer.dart';
 import 'package:unigo/view/newitemscreen.dart';
-import 'package:unigo/view/profilescreen.dart';
 import 'package:unigo/view/registerscreen.dart';
 import 'package:http/http.dart' as http;
-import 'package:unigo/view/useritemscreen.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MainScreen extends StatefulWidget {
@@ -23,7 +21,12 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   List<Item> itemList = <Item>[]; // List of item objects
-
+  int numofpage = 1;
+  int curpage = 1;
+  int numofresult = 0;
+  late double screenWidth, screenHeight;
+  var color;
+  String status = "Searching...";
   @override
   void initState() {
     // TODO: implement initState
@@ -33,40 +36,13 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Main Screen"),
         backgroundColor: Colors.amber.shade900,
         actions: [
-          IconButton(
-              onPressed: () async {
-                if (widget.user.userId != "0") {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => UserItemScreen(
-                              user: widget.user,
-                            )),
-                  );
-                  loadItems("all");
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Please login to view your items."),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                }
-              },
-              icon: const Icon(Icons.verified_user)),
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
-              },
-              icon: const Icon(Icons.login)),
           IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () {
@@ -80,81 +56,131 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
       body: itemList.isEmpty
-          ? const Center(child: Text("No items found."))
-          : ListView.builder(
-              itemCount: itemList.length,
-              itemBuilder: (context, index) {
-                final item = itemList[index];
-                final imageUrl =
-                    "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  child: InkWell(
-                    splashColor: Colors.red,
-                    onTap: () {
-                      showItemDetails(item);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Image
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: Image.network(
-                              imageUrl,
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.broken_image, size: 80),
-                            ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-                          // Item details (middle column)
-                          Expanded(
-                            child: Column(
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.search_off,
+                    size: 80,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    status,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Try adjusting your search or check back later.",
+                    style: TextStyle(color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: itemList.length,
+                    itemBuilder: (context, index) {
+                      final item = itemList[index];
+                      final imageUrl =
+                          "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        child: InkWell(
+                          splashColor: Colors.red,
+                          onTap: () {
+                            showItemDetails(item);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item.itemName ?? "No name",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
-                                Text("Price: RM ${item.itemPrice}"),
-                                Text("Qty: ${item.itemQty}"),
-                                Text("Delivery: ${item.itemDelivery}"),
-                                Text(
-                                    "Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
-                                Text("Date: ${formatDate(item.itemDate)}"),
+                                // Image
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Image.network(
+                                    imageUrl,
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.broken_image,
+                                                size: 80),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                // Item details (middle column)
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(item.itemName ?? "No name",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16)),
+                                      Text("Price: RM ${item.itemPrice}"),
+                                      Text("Qty: ${item.itemQty}"),
+                                      Text("Delivery: ${item.itemDelivery}"),
+                                      Text(
+                                          "Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
+                                      Text(
+                                          "Date: ${formatDate(item.itemDate)}"),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-
-                          // Trailing full-height section (e.g., for buttons or icons)
-                          // Container(
-                          //   height: 80, // same as image height
-                          //   child: Column(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Icon(Icons.edit, color: Colors.blue),
-                          //       Icon(Icons.delete, color: Colors.red),
-                          //     ],
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+                SizedBox(
+                  height: screenHeight * 0.05,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: numofpage,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      //build the list for textbutton with scroll
+                      if ((curpage - 1) == index) {
+                        //set current page number active
+                        color = Colors.red;
+                      } else {
+                        color = Colors.black;
+                      }
+                      return TextButton(
+                          onPressed: () {
+                            curpage = index + 1;
+                            loadItems("all");
+                          },
+                          child: Text(
+                            (index + 1).toString(),
+                            style: TextStyle(color: color, fontSize: 18),
+                          ));
+                    },
+                  ),
+                ),
+              ],
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (widget.user.userId == "0") {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Please login to add items."),
+            ));
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const RegisterScreen()),
@@ -171,126 +197,14 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: Colors.amber.shade900,
         child: const Icon(Icons.add),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.amber.shade900,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: widget.user.userId == "0"
-                        ? const AssetImage("assets/images/user.png")
-                        : NetworkImage(
-                            "${MyConfig.myurl}unigo/assets/images/users/user-${widget.user.userId}.png",
-                          ) as ImageProvider<Object>,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    widget.user.userName ?? "Guest",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text("Home"),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MainScreen(user: widget.user)),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.verified_user),
-              title: const Text("Your Items"),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => UserItemScreen(user: widget.user)),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text("Profile"),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ProfileScreen(user: widget.user)),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text("Logout"),
-              onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-          onTap: (int index) {
-            // print("Tapped on index $index");
-            if (index == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MainScreen(user: widget.user)),
-              );
-            }
-            if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => UserItemScreen(user: widget.user)),
-              );
-            }
-            if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ProfileScreen(user: widget.user)),
-              );
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.verified_user),
-              label: "Your Items",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Profile",
-            ),
-          ]),
+      drawer: MyDrawer(user: widget.user),
     );
   }
 
   void loadItems(String s) {
     http
-        .get(Uri.parse("${MyConfig.myurl}/unigo/php/load_items.php?search=$s"))
+        .get(Uri.parse(
+            "${MyConfig.myurl}/unigo/php/load_items.php?search=$s&pageno=$curpage"))
         .then((response) {
       log(response.body);
       if (response.statusCode == 200) {
@@ -303,6 +217,12 @@ class _MainScreenState extends State<MainScreen> {
             itemList.add(t);
             print(t.itemPrice.toString());
           });
+          numofpage = int.parse(data['numofpage'].toString());
+          numofresult = int.parse(data['numberofresult'].toString());
+          setState(() {});
+        } else {
+          itemList.clear();
+          status = "No item found";
           setState(() {});
         }
       }
@@ -322,7 +242,7 @@ class _MainScreenState extends State<MainScreen> {
   void showItemDetails(Item item) {
     final imageUrl =
         "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
-    final phone = "+6${item.userPhone}" ?? "";
+    final phone = "+6${item.userPhone}";
 
     showDialog(
       context: context,
@@ -383,7 +303,7 @@ class _MainScreenState extends State<MainScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ElevatedButton.icon(
+                      IconButton(
                         onPressed: phone.isNotEmpty
                             ? () => _launchDialer(phone)
                             : null,
@@ -393,9 +313,8 @@ class _MainScreenState extends State<MainScreen> {
                               borderRadius: BorderRadius.circular(8)),
                         ),
                         icon: const Icon(Icons.call),
-                        label: Text(""),
                       ),
-                      ElevatedButton.icon(
+                      IconButton(
                         onPressed: phone.isNotEmpty
                             ? () => _launchWhatsApp(phone)
                             : null,
@@ -405,17 +324,26 @@ class _MainScreenState extends State<MainScreen> {
                               borderRadius: BorderRadius.circular(8)),
                         ),
                         icon: const Icon(Icons.chat),
-                        label: Text(""),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () => Navigator.of(context).pop(),
+                      IconButton(
+                        onPressed: () {
+                          if (widget.user.userId == item.userId) {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content:
+                                  Text("You cannot send messages to yourself."),
+                            ));
+                          } else {
+                            _showMessagePopup(item.userId.toString(),
+                                widget.user.userId.toString());
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
-                        icon: const Icon(Icons.close),
-                        label: const Text("Close"),
+                        icon: const Icon(Icons.email),
                       ),
                     ],
                   )
@@ -506,5 +434,74 @@ class _MainScreenState extends State<MainScreen> {
         );
       },
     );
+  }
+
+  void _showMessagePopup(String receiverId, String senderId) {
+    TextEditingController messageController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Send Message"),
+        content: TextField(
+          controller: messageController,
+          maxLines: 2,
+          decoration: const InputDecoration(
+            labelText: "Enter your message",
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (messageController.text.trim().isNotEmpty) {
+                _sendMessage(
+                    senderId, receiverId, messageController.text.trim());
+                Navigator.of(context).pop();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Message cannot be empty."),
+                ));
+              }
+            },
+            child: const Text("Send"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sendMessage(
+      String senderId, String receiverId, String content) async {
+    final response = await http.post(
+      Uri.parse("${MyConfig.myurl}unigo/php/send_message.php"),
+      body: {
+        "sender_id": senderId,
+        "receiver_id": receiverId,
+        "message_content": content,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print(response.body);
+      var jsonResponse = jsonDecode(response.body);
+      if (jsonResponse['status'] == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Message sent."),
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to send: ${jsonResponse['message']}"),
+        ));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Failed to send message."),
+      ));
+    }
   }
 }
