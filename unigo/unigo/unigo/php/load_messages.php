@@ -1,52 +1,51 @@
 <?php
-error_reporting( 0 );
-header( 'Access-Control-Allow-Origin: *' );
-
 include_once( 'dbconnect.php' );
 
-if ( !isset( $_POST[ 'user_id' ] ) ) {
-    echo json_encode( [ 'status' => 'failed', 'message' => 'Missing user_id' ] );
-    die();
-}
+if ( $_SERVER[ 'REQUEST_METHOD' ] === 'POST' ) {
+    $userId = $_POST[ 'user_id' ] ?? '';
 
-$user_id = $_POST[ 'user_id' ];
+    if ( empty( $userId ) ) {
+        sendJsonResponse( [ 'status' => 'failed', 'message' => 'User ID is required.' ] );
+        exit();
+    }
 
-$sql = "SELECT 
-            m.message_id,
-            m.sender_id,
-            m.receiver_id,
-            m.message,
-            m.sent_time,
-            m.is_read,
-            u.user_name AS sender_name
-        FROM tbl_messages m
-        JOIN tbl_users u ON m.sender_id = u.user_id
-        WHERE m.receiver_id = ?
-        ORDER BY m.sent_time DESC";
+    $sql = "SELECT 
+                m1.*, 
+                sender.user_name AS sender_name,
+                receiver.user_name AS receiver_name
+            FROM tbl_messages m1
+            JOIN (
+                SELECT 
+                    LEAST(sender_id, receiver_id) AS user1,
+                    GREATEST(sender_id, receiver_id) AS user2,
+                    MAX(message_id) AS max_id
+                FROM tbl_messages
+                WHERE sender_id = ? OR receiver_id = ?
+                GROUP BY user1, user2
+            ) latest ON m1.message_id = latest.max_id
+            JOIN tbl_users sender ON sender.user_id = m1.sender_id
+            JOIN tbl_users receiver ON receiver.user_id = m1.receiver_id
+            ORDER BY m1.sent_time DESC";
 
-$stmt = $conn->prepare( $sql );
-$stmt->bind_param( 's', $user_id );
-$stmt->execute();
-$result = $stmt->get_result();
+    $stmt = $conn->prepare( $sql );
+    $stmt->bind_param( 'ii', $userId, $userId );
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-if ( $result->num_rows > 0 ) {
     $messages = [];
     while ( $row = $result->fetch_assoc() ) {
-        $messages[] = [
-            'message_id' => $row[ 'message_id' ],
-            'sender_id' => $row[ 'sender_id' ],
-            'receiver_id' => $row[ 'receiver_id' ],
-            'message' => $row[ 'message' ],
-            'sent_time' => $row[ 'sent_time' ],
-            'is_read' => $row[ 'is_read' ],
-            'sender_name' => $row[ 'sender_name' ]
-        ];
+        $messages[] = $row;
     }
-    echo json_encode( [ 'status' => 'success', 'messages' => $messages ] );
+
+    sendJsonResponse( [ 'status' => 'success', 'messages' => $messages ] );
 } else {
-    echo json_encode( [ 'status' => 'success', 'messages' => [] ] );
+    sendJsonResponse( [ 'status' => 'failed', 'message' => 'Invalid request method.' ] );
 }
 
-$stmt->close();
-$conn->close();
+function sendJsonResponse( $sentArray )
+ {
+    header( 'Content-Type: application/json' );
+    echo json_encode( $sentArray );
+    exit();
+}
 ?>

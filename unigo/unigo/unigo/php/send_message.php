@@ -9,7 +9,9 @@ if ( $_SERVER[ 'REQUEST_METHOD' ] === 'POST' ) {
     $senderId = $_POST[ 'sender_id' ] ?? '';
     $receiverId = $_POST[ 'receiver_id' ] ?? '';
     $messageContent = $_POST[ 'message_content' ] ?? '';
-
+    $productId = $_POST[ 'product_id' ] ?? null;
+    $productName = $_POST[ 'product_name' ] ?? null;
+    $messageContent = "$productName\n\n$messageContent";
     if ( empty( $senderId ) || empty( $receiverId ) || empty( $messageContent ) ) {
         sendJsonResponse( [ 'status' => 'failed', 'message' => 'Missing required fields' ] );
         exit();

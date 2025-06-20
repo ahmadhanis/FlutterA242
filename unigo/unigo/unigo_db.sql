@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 19, 2025 at 06:35 PM
+-- Generation Time: May 22, 2025 at 09:11 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,37 +47,13 @@ INSERT INTO `tbl_items` (`item_id`, `user_id`, `item_name`, `item_desc`, `item_s
 (1, '2', 'Rare Tshirt Metalica', 'Use but rarely wear', 'New', 1, 250, 'Pickup', '2025-05-19 14:11:21.367790'),
 (2, '2', 'Used TV', '1 year old 32 inch tv', 'Used', 1, 350, 'Pickup', '2025-05-22 11:12:45.571700'),
 (3, '2', '2 person sofa', '2 years old stil good condition', 'Used', 1, 150, 'Pickup', '2025-05-22 11:13:35.569325'),
+(4, '2', 'Coffee Table', 'Used 2 years', 'Used', 1, 25, 'Pickup', '2025-05-22 11:33:12.699932'),
 (5, '2', 'Shoe Rack', 'Used like new', 'Used', 1, 25, 'Pickup', '2025-05-22 11:34:27.565580'),
 (6, '3', 'Used Stove', 'Used but stil in working condition', 'Used', 1, 550, 'Pickup', '2025-05-22 11:45:32.364157'),
 (7, '3', 'Dining Set', 'Old Dining set to letgo', 'Used', 1, 250, 'Pickup', '2025-05-22 11:49:43.379840'),
 (8, '4', '2 Door fridge', '5 years old fridge', 'Used', 1, 300, 'Pickup', '2025-05-22 11:56:29.381489'),
 (9, '2', 'Hood', 'Used', 'Used', 1, 100, 'Postage', '2025-05-22 14:11:50.738612'),
 (10, '2', 'Dog statue', 'very ancient', 'Used', 1, 500, 'Postage', '2025-05-22 14:16:01.031471');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_messages`
---
-
-CREATE TABLE `tbl_messages` (
-  `message_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `receiver_id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `attachment_url` varchar(255) DEFAULT NULL,
-  `reply_to` int(11) DEFAULT NULL,
-  `sent_time` datetime DEFAULT current_timestamp(),
-  `is_read` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_messages`
---
-
-INSERT INTO `tbl_messages` (`message_id`, `sender_id`, `receiver_id`, `message`, `attachment_url`, `reply_to`, `sent_time`, `is_read`) VALUES
-(1, 2, 3, 'hellio', NULL, NULL, '2025-06-20 00:23:27', 0),
-(2, 3, 2, 'Hello sire', NULL, NULL, '2025-06-20 00:30:30', 0);
 
 -- --------------------------------------------------------
 
@@ -101,7 +77,7 @@ CREATE TABLE `tbl_users` (
 --
 
 INSERT INTO `tbl_users` (`user_id`, `user_name`, `user_email`, `user_password`, `user_phone`, `user_university`, `user_address`, `user_datereg`) VALUES
-(2, 'Ahmad Hanis', 'slumberjer@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0195929107', 'UUM', 'Sintok', '2025-05-15 13:11:34.296275'),
+(2, 'Ahmad Hanis', 'slumberjer@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0194702493', 'UUM', 'Sintok', '2025-05-15 13:11:34.296275'),
 (3, 'Ali', 'ali@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '01947554443', 'UMS', 'Samarahan', '2025-05-15 13:12:24.530083'),
 (4, 'Abu', 'abu@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0194755555', 'UTM', 'Skudai', '2025-05-15 13:16:12.234566');
 
@@ -114,15 +90,6 @@ INSERT INTO `tbl_users` (`user_id`, `user_name`, `user_email`, `user_password`, 
 --
 ALTER TABLE `tbl_items`
   ADD PRIMARY KEY (`item_id`);
-
---
--- Indexes for table `tbl_messages`
---
-ALTER TABLE `tbl_messages`
-  ADD PRIMARY KEY (`message_id`),
-  ADD KEY `sender_id` (`sender_id`),
-  ADD KEY `receiver_id` (`receiver_id`),
-  ADD KEY `reply_to` (`reply_to`);
 
 --
 -- Indexes for table `tbl_users`
@@ -142,28 +109,10 @@ ALTER TABLE `tbl_items`
   MODIFY `item_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT for table `tbl_messages`
---
-ALTER TABLE `tbl_messages`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
 -- AUTO_INCREMENT for table `tbl_users`
 --
 ALTER TABLE `tbl_users`
   MODIFY `user_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `tbl_messages`
---
-ALTER TABLE `tbl_messages`
-  ADD CONSTRAINT `tbl_messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `tbl_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `tbl_messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `tbl_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `tbl_messages_ibfk_3` FOREIGN KEY (`reply_to`) REFERENCES `tbl_messages` (`message_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

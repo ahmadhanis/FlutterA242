@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_typing_uninitialized_variables, use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
@@ -27,9 +29,10 @@ class _MainScreenState extends State<MainScreen> {
   late double screenWidth, screenHeight;
   var color;
   String status = "Searching...";
+  GlobalKey<RefreshIndicatorState> refreshKey =
+      GlobalKey<RefreshIndicatorState>();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     loadItems("all");
   }
@@ -40,8 +43,18 @@ class _MainScreenState extends State<MainScreen> {
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Main Screen"),
-        backgroundColor: Colors.amber.shade900,
+        title: const Text("Market Place"),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.amber.shade900, Colors.purple.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         actions: [
           IconButton(
               icon: const Icon(Icons.refresh),
@@ -55,126 +68,141 @@ class _MainScreenState extends State<MainScreen> {
               }),
         ],
       ),
-      body: itemList.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.search_off,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    status,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Try adjusting your search or check back later.",
-                    style: TextStyle(color: Colors.grey),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: itemList.length,
-                    itemBuilder: (context, index) {
-                      final item = itemList[index];
-                      final imageUrl =
-                          "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 12),
-                        child: InkWell(
-                          splashColor: Colors.red,
-                          onTap: () {
-                            showItemDetails(item);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Image
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: Image.network(
-                                    imageUrl,
-                                    width: 120,
-                                    height: 120,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(Icons.broken_image,
-                                                size: 80),
-                                  ),
-                                ),
-
-                                const SizedBox(width: 10),
-
-                                // Item details (middle column)
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(item.itemName ?? "No name",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16)),
-                                      Text("Price: RM ${item.itemPrice}"),
-                                      Text("Qty: ${item.itemQty}"),
-                                      Text("Delivery: ${item.itemDelivery}"),
-                                      Text(
-                                          "Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
-                                      Text(
-                                          "Date: ${formatDate(item.itemDate)}"),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+      body: RefreshIndicator(
+          key: refreshKey,
+          color: Colors.amber.shade900,
+          onRefresh: () async {
+            loadItems("all");
+          },
+          child: itemList.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search_off,
+                        size: 80,
+                        color: Colors.grey.shade600,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        status,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Try adjusting your search or check back later.",
+                        style: TextStyle(color: Colors.white70),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(
-                  height: screenHeight * 0.05,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: numofpage,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      //build the list for textbutton with scroll
-                      if ((curpage - 1) == index) {
-                        //set current page number active
-                        color = Colors.red;
-                      } else {
-                        color = Colors.black;
-                      }
-                      return TextButton(
-                          onPressed: () {
-                            curpage = index + 1;
-                            loadItems("all");
-                          },
-                          child: Text(
-                            (index + 1).toString(),
-                            style: TextStyle(color: color, fontSize: 18),
-                          ));
-                    },
-                  ),
-                ),
-              ],
-            ),
+                )
+              : Column(
+                  children: [
+                    Container(
+                        padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                        child: Text(
+                          "Number of Result: $numofresult of $numofpage page/s",
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        )),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: itemList.length,
+                        itemBuilder: (context, index) {
+                          final item = itemList[index];
+                          final imageUrl =
+                              "${MyConfig.myurl}unigo/assets/images/items/item-${item.itemId}.png";
+                          return Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12),
+                            child: InkWell(
+                              splashColor: Colors.purple.shade200,
+                              onTap: () {
+                                showItemDetails(item);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: Image.network(
+                                        imageUrl,
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(Icons.broken_image,
+                                                    size: 80),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(item.itemName ?? "No name",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color:
+                                                      Colors.purple.shade600)),
+                                          Text("Price: RM ${item.itemPrice}"),
+                                          Text("Qty: ${item.itemQty}"),
+                                          Text(
+                                              "Delivery: ${item.itemDelivery}"),
+                                          Text(
+                                              "Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
+                                          Text(
+                                              "Date: ${formatDate(item.itemDate)}"),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenHeight * 0.05,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: numofpage,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          color = (curpage - 1) == index
+                              ? Colors.purple.shade600
+                              : Colors.black;
+                          return TextButton(
+                              onPressed: () {
+                                curpage = index + 1;
+                                loadItems("all");
+                              },
+                              child: Text(
+                                (index + 1).toString(),
+                                style: TextStyle(color: color, fontSize: 18),
+                              ));
+                        },
+                      ),
+                    ),
+                  ],
+                )),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (widget.user.userId == "0") {
@@ -194,7 +222,7 @@ class _MainScreenState extends State<MainScreen> {
             loadItems("all");
           }
         },
-        backgroundColor: Colors.amber.shade900,
+        // backgroundColor: Colors.purple.shade600,
         child: const Icon(Icons.add),
       ),
       drawer: MyDrawer(user: widget.user),
@@ -215,7 +243,6 @@ class _MainScreenState extends State<MainScreen> {
             //  print(myitem);
             Item t = Item.fromJson(myitem);
             itemList.add(t);
-            print(t.itemPrice.toString());
           });
           numofpage = int.parse(data['numofpage'].toString());
           numofresult = int.parse(data['numberofresult'].toString());
@@ -297,7 +324,7 @@ class _MainScreenState extends State<MainScreen> {
                   if (phone.isNotEmpty)
                     _buildIconRow(Icons.phone, "Phone", phone),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   // Action buttons row
                   Row(
@@ -308,7 +335,7 @@ class _MainScreenState extends State<MainScreen> {
                             ? () => _launchDialer(phone)
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade600,
+                          // backgroundColor: Colors.green.shade600,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
@@ -319,7 +346,7 @@ class _MainScreenState extends State<MainScreen> {
                             ? () => _launchWhatsApp(phone)
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
+                          // backgroundColor: Colors.teal,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
@@ -334,12 +361,15 @@ class _MainScreenState extends State<MainScreen> {
                                   Text("You cannot send messages to yourself."),
                             ));
                           } else {
-                            _showMessagePopup(item.userId.toString(),
-                                widget.user.userId.toString());
+                            _showMessagePopup(
+                                item.userId.toString(),
+                                widget.user.userId.toString(),
+                                item.itemId.toString(),
+                                item.itemName.toString());
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey,
+                          // backgroundColor: Colors.grey,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
@@ -420,7 +450,6 @@ class _MainScreenState extends State<MainScreen> {
                   );
                   return;
                 }
-                print(searchTerm);
                 loadItems(searchTerm);
                 Navigator.of(context).pop();
               },
@@ -436,7 +465,8 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void _showMessagePopup(String receiverId, String senderId) {
+  void _showMessagePopup(
+      String receiverId, String senderId, String itemId, String itemName) {
     TextEditingController messageController = TextEditingController();
 
     showDialog(
@@ -460,7 +490,12 @@ class _MainScreenState extends State<MainScreen> {
             onPressed: () {
               if (messageController.text.trim().isNotEmpty) {
                 _sendMessage(
-                    senderId, receiverId, messageController.text.trim());
+                  senderId,
+                  receiverId,
+                  messageController.text.trim(),
+                  itemId,
+                  itemName,
+                );
                 Navigator.of(context).pop();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -476,18 +511,24 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _sendMessage(
-      String senderId, String receiverId, String content) async {
+    String senderId,
+    String receiverId,
+    String content,
+    String productId,
+    String productName,
+  ) async {
     final response = await http.post(
       Uri.parse("${MyConfig.myurl}unigo/php/send_message.php"),
       body: {
         "sender_id": senderId,
         "receiver_id": receiverId,
         "message_content": content,
+        "product_id": productId,
+        "product_name": productName,
       },
     );
 
     if (response.statusCode == 200) {
-      print(response.body);
       var jsonResponse = jsonDecode(response.body);
       if (jsonResponse['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -40,7 +42,17 @@ class _NewItemScreenState extends State<NewItemScreen> {
       backgroundColor: Colors.amber.shade50,
       appBar: AppBar(
         title: const Text("Add New Item"),
-        backgroundColor: Colors.amber.shade900,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.amber.shade900, Colors.purple.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -108,7 +120,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
                           onChanged: (val) => setState(() => itemStatus = val!),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           value: itemQty,

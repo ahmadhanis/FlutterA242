@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -60,7 +62,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Colors.amber.shade50,
       appBar: AppBar(
         title: const Text("Register"),
-        backgroundColor: Colors.amber.shade900,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.amber.shade900, Colors.purple.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -326,7 +336,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      // Your geolocation + reverse geocoding code
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Location permission denied.")),
+          );
+          setState(() => isLocating = false);
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                "Location permission permanently denied. Please enable it in settings."),
+          ),
+        );
+        setState(() => isLocating = false);
+        return;
+      }
+
+      // Get location
       Position position = await Geolocator.getCurrentPosition();
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,

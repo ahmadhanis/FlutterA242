@@ -1,8 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:unigo/model/user.dart';
-import 'package:unigo/shared/animated_route.dart';
 import 'package:unigo/shared/myconfig.dart';
 import 'package:unigo/view/mainscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,18 +35,32 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.amber.shade50,
       appBar: AppBar(
         title: const Text("Login"),
-        backgroundColor: Colors.amber.shade900,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.amber.shade900, Colors.purple.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            Image.asset("assets/images/unigo.png", height: 150),
-            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Image.asset(
+                "assets/images/unigo.png",
+                scale: 4.5,
+              ),
+            ),
             Card(
-              elevation: 6,
+              elevation: 8,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Form(
@@ -55,10 +70,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextFormField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Email",
-                          prefixIcon: Icon(Icons.email),
-                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.email),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         validator: (value) => value == null || value.isEmpty
                             ? "Email is required"
@@ -83,7 +102,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               });
                             },
                           ),
-                          border: const OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         validator: (value) => value == null || value.isEmpty
                             ? "Password is required"
@@ -96,32 +119,57 @@ class _LoginScreenState extends State<LoginScreen> {
                             value: isChecked,
                             onChanged: (value) {
                               setState(() => isChecked = value!);
-                              storeCredentials(emailController.text,
-                                  passwordController.text, value!);
+                              storeCredentials(
+                                emailController.text,
+                                passwordController.text,
+                                value!,
+                              );
                             },
+                            activeColor: Colors.purple.shade600,
                           ),
-                          const Text("Remember Me"),
+                          const Text("Remember "),
                           const Spacer(),
                           TextButton(
-                            onPressed:
-                                () {}, // Optional forgot password feature
-                            child: const Text("Forgot Password?"),
+                            onPressed: () {},
+                            child: Text(
+                              "Forgot Password?",
+                              style: TextStyle(color: Colors.purple.shade600),
+                            ),
                           )
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
-                        height: 45,
-                        child: ElevatedButton.icon(
+                        height: 48,
+                        child: ElevatedButton(
                           onPressed: loginUser,
-                          icon: const Icon(Icons.login),
-                          label: const Text("Login"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber.shade900,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                             ),
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                          ).copyWith(
+                            backgroundColor:
+                                WidgetStateProperty.all(Colors.amber.shade900),
+                            elevation: WidgetStateProperty.all(6),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.login, color: Colors.white),
+                              SizedBox(width: 8),
+                              Text(
+                                "Login",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -131,15 +179,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(context,
-                    AnimatedRoute.slideFromRight(const RegisterScreen()));
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                );
               },
-              child: const Text(
-                "Don't have an account? Register",
-                style: TextStyle(decoration: TextDecoration.underline),
-              ),
+              child: const Text("Don't have an account? Register here"),
             ),
           ],
         ),

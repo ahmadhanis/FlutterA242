@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -52,7 +54,17 @@ class _EditItemScreenState extends State<EditItemScreen> {
       backgroundColor: Colors.amber.shade50,
       appBar: AppBar(
         title: const Text("Edit Item"),
-        backgroundColor: Colors.amber.shade900,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.amber.shade900, Colors.purple.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -122,7 +134,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
                           onChanged: (val) => setState(() => itemStatus = val!),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           value: itemQty,
@@ -302,11 +314,5 @@ class _EditItemScreenState extends State<EditItemScreen> {
       content: Text(message),
       backgroundColor: color,
     ));
-  }
-
-  ImageProvider _buildItemImage() {
-    return kIsWeb
-        ? MemoryImage(webImageBytes!)
-        : FileImage(_image!) as ImageProvider;
   }
 }

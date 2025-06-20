@@ -10,7 +10,7 @@ $userid = $_GET[ 'userid' ] ?? null;
 $number_of_result = 0;
 $numberofresult = 0;
 //step 1
-$results_per_page = 5;
+$results_per_page = 10;
 //step 2
 if ( isset( $_GET[ 'pageno' ] ) ) {
     $pageno = ( int )$_GET[ 'pageno' ];
@@ -37,10 +37,9 @@ $baseQuery = "SELECT
 FROM tbl_items i
 JOIN tbl_users u ON i.user_id = u.user_id";
 
-$whereClauses = [];
+$whereClauses[] = "i.item_status != 'sold'";
 
 if ( $search !== 'all' ) {
-    // Use parentheses to group OR conditions correctly
     $whereClauses[] = "(i.item_name LIKE '%$search%' OR i.item_desc LIKE '%$search%')";
 }
 
