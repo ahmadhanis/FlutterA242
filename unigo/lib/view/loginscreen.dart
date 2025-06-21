@@ -143,10 +143,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                         },
                                         activeColor: Colors.purple.shade600,
                                       ),
-                                      const Text("Remember "),
+                                      const Text("Remember Me"),
                                       const Spacer(),
                                       TextButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          forgotPasswordDialog(context);
+                                        },
                                         child: Text(
                                           "Forgot Password?",
                                           style: TextStyle(
@@ -302,5 +304,77 @@ class _LoginScreenState extends State<LoginScreen> {
       passwordController.text = prefs.getString('pass') ?? '';
       isChecked = prefs.getBool('remember') ?? false;
     });
+  }
+
+  void forgotPasswordDialog(BuildContext context) {
+    TextEditingController emailController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Forgot Password"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                  "Please enter your email address to reset your password."),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                String email = emailController.text;
+                forgotPassword(email);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> forgotPassword(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${MyConfig.myurl}/unigo/php/forgot_password.php"),
+        body: {"email": email},
+      );
+
+      if (response.statusCode == 200) {
+        final jsondata = json.decode(response.body);
+
+        final message = jsondata['message'] ?? "Unexpected response";
+        final color =
+            jsondata['status'] == 'success' ? Colors.green : Colors.red;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: color),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Server error. Please try again later."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to connect. Please check your internet."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
