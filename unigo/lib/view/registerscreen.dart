@@ -72,118 +72,144 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 900),
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: showSelectionDialog,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.grey.shade300,
+                        backgroundImage: _image == null
+                            ? null
+                            : _buildProfileImage(), // Make sure this returns ImageProvider
+                        child: _image == null
+                            ? const Icon(Icons.camera_alt,
+                                size: 40, color: Colors.white70)
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(6),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildRegistrationForm(),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildRegistrationForm() {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _formKey,
           child: Column(
             children: [
-              Card(
-                elevation: 6,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: showSelectionDialog,
-                          child: CircleAvatar(
-                            radius: 60,
-                            backgroundColor: Colors.grey.shade300,
-                            backgroundImage: _image == null
-                                ? const AssetImage("assets/images/camera.png")
-                                : _buildProfileImage(),
+              _buildTextField(nameController, "Full Name", TextInputType.name),
+              _buildTextField(
+                  emailController, "Email", TextInputType.emailAddress),
+              _buildPasswordField(passwordController, "Password"),
+              _buildPasswordField(confirmPasswordController, "Confirm Password",
+                  confirm: true),
+              _buildTextField(phoneController, "Phone", TextInputType.phone),
+              TextFormField(
+                controller: addressController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  labelText: "Address",
+                  prefixIcon: const Icon(Icons.home),
+                  suffixIcon: isLocating
+                      ? const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           ),
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.my_location),
+                          tooltip: "Use Current Location",
+                          onPressed: _getCurrentAddress,
                         ),
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                            nameController, "Full Name", TextInputType.name),
-                        _buildTextField(emailController, "Email",
-                            TextInputType.emailAddress),
-                        _buildPasswordField(passwordController, "Password"),
-                        _buildPasswordField(
-                            confirmPasswordController, "Confirm Password",
-                            confirm: true),
-                        _buildTextField(
-                            phoneController, "Phone", TextInputType.phone),
-                        TextFormField(
-                          controller: addressController,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            labelText: "Address",
-                            prefixIcon: const Icon(Icons.home),
-                            suffixIcon: isLocating
-                                ? const Padding(
-                                    padding: EdgeInsets.all(12.0),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    ),
-                                  )
-                                : IconButton(
-                                    icon: const Icon(Icons.my_location),
-                                    tooltip: "Use Current Location",
-                                    onPressed: _getCurrentAddress,
-                                  ),
-                            border: const OutlineInputBorder(),
-                          ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? "Address is required"
-                              : null,
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          value: university,
-                          decoration: const InputDecoration(
-                            labelText: "University",
-                            border: OutlineInputBorder(),
-                          ),
-                          items: unilist.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() => university = newValue!);
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.person_add),
-                            label: const Text("Register"),
-                            onPressed: registerUserDialog,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.amber.shade900,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const LoginScreen()),
-                            );
-                          },
-                          child:
-                              const Text("Already have an account? Login here"),
-                        ),
-                      ],
+                  border: const OutlineInputBorder(),
+                ),
+                validator: (value) => value == null || value.isEmpty
+                    ? "Address is required"
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: university,
+                decoration: const InputDecoration(
+                  labelText: "University",
+                  border: OutlineInputBorder(),
+                ),
+                items: unilist.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() => university = newValue!);
+                },
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.person_add),
+                  label: const Text("Register"),
+                  onPressed: registerUserDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber.shade900,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  );
+                },
+                child: const Text("Already have an account? Login here"),
               ),
             ],
           ),

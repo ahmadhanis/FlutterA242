@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:unigo/model/user.dart';
 import 'package:unigo/shared/myconfig.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class NewItemScreen extends StatefulWidget {
   final User user;
@@ -55,7 +56,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         child: Card(
           elevation: 6,
           shape:
@@ -110,7 +111,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
                         child: DropdownButtonFormField<String>(
                           value: itemStatus,
                           decoration: const InputDecoration(
-                            labelText: "Item Status",
+                            labelText: "Status",
                             border: OutlineInputBorder(),
                           ),
                           items: itemStatusOptions.map((String value) {
@@ -286,7 +287,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       if (kIsWeb) webImageBytes = await pickedFile.readAsBytes();
-      setState(() {});
+      cropImage();
+      // setState(() {});
     }
   }
 
@@ -301,7 +303,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       if (kIsWeb) webImageBytes = await pickedFile.readAsBytes();
-      setState(() {});
+      cropImage();
+      // setState(() {});
     }
   }
 
@@ -309,5 +312,28 @@ class _NewItemScreenState extends State<NewItemScreen> {
     return kIsWeb
         ? MemoryImage(webImageBytes!)
         : FileImage(_image!) as ImageProvider;
+  }
+
+  Future<void> cropImage() async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: _image!.path,
+      aspectRatio: const CropAspectRatio(ratioX: 5, ratioY: 3),
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Please Crop Your Image',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      File imageFile = File(croppedFile.path);
+      _image = imageFile;
+      setState(() {});
+    }
   }
 }

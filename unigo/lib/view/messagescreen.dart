@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:unigo/model/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:unigo/shared/animated_route.dart';
 import 'dart:convert';
 import 'package:unigo/shared/myconfig.dart';
 import 'package:unigo/shared/mydrawer.dart';
@@ -164,18 +165,20 @@ class _MessageScreenState extends State<MessageScreen> {
                             ? receiverId
                             : senderId;
                         await _markMessageAsRead(msg['message_id'].toString());
-
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => ConversationScreen(
-                              user: widget.user,
-                              partnerId: partnerId,
-                              partnerName:
-                                  "${msg['receiver_name']} with ${msg['sender_name']}",
-                            ),
-                          ),
+                          AnimatedRoute.slideFromRight(ConversationScreen(
+                            user: widget.user,
+                            partnerId: partnerId,
+                            partnerName:
+                                "${msg['receiver_name']} with ${msg['sender_name']}",
+                          )),
                         );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (_) => ConversationScreen()),
+                        // );
                       },
                     );
                   },

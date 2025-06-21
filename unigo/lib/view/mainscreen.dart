@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, use_build_context_synchronously
+// ignore_for_file: prefer_typing_uninitialized_variables, use_build_context_synchronously, unused_element
 
 import 'dart:convert';
 import 'dart:developer';
@@ -29,6 +29,8 @@ class _MainScreenState extends State<MainScreen> {
   late double screenWidth, screenHeight;
   var color;
   String status = "Searching...";
+  bool isLoading = false;
+
   GlobalKey<RefreshIndicatorState> refreshKey =
       GlobalKey<RefreshIndicatorState>();
   @override
@@ -80,7 +82,9 @@ class _MainScreenState extends State<MainScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.search_off,
+                        status == "Searching..."
+                            ? Icons.search
+                            : Icons.search_off,
                         size: 80,
                         color: Colors.grey.shade600,
                       ),
@@ -90,13 +94,12 @@ class _MainScreenState extends State<MainScreen> {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         "Try adjusting your search or check back later.",
-                        style: TextStyle(color: Colors.white70),
+                        style: TextStyle(),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -104,6 +107,15 @@ class _MainScreenState extends State<MainScreen> {
                 )
               : Column(
                   children: [
+                    Visibility(
+                      visible: isLoading,
+                      child: LinearProgressIndicator(
+                        value: curpage / numofpage,
+                        backgroundColor: Colors.grey.shade300,
+                        color: Colors.amber.shade900,
+                        minHeight: 4,
+                      ),
+                    ),
                     Container(
                         padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                         child: Text(
@@ -230,6 +242,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void loadItems(String s) {
+    setState(() {
+      isLoading = true; // show loading bar
+    });
     http
         .get(Uri.parse(
             "${MyConfig.myurl}/unigo/php/load_items.php?search=$s&pageno=$curpage"))
@@ -246,12 +261,12 @@ class _MainScreenState extends State<MainScreen> {
           });
           numofpage = int.parse(data['numofpage'].toString());
           numofresult = int.parse(data['numberofresult'].toString());
-          setState(() {});
         } else {
           itemList.clear();
           status = "No item found";
-          setState(() {});
         }
+        isLoading = false; // hide loading bar
+        setState(() {});
       }
     });
   }
@@ -273,116 +288,162 @@ class _MainScreenState extends State<MainScreen> {
 
     showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Top Image Banner
+              Stack(
                 children: [
-                  Text(
-                    item.itemName ?? "No Name",
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                  AspectRatio(
+                    aspectRatio: 3 / 2,
                     child: Image.network(
                       imageUrl,
                       width: double.infinity,
-                      height: 200,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(
-                        height: 200,
                         color: Colors.grey.shade200,
                         child: const Center(
-                            child: Icon(Icons.broken_image, size: 60)),
+                          child: Icon(Icons.broken_image, size: 60),
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildIconRow(Icons.description, "Description",
-                      item.itemDesc ?? "No description"),
-                  _buildIconRow(
-                      Icons.verified, "Status", item.itemStatus ?? "No status"),
-                  _buildIconRow(Icons.price_change, "Price",
-                      "RM ${item.itemPrice ?? "0"}"),
-                  _buildIconRow(Icons.confirmation_number, "Quantity",
-                      item.itemQty ?? "0"),
-                  _buildIconRow(Icons.local_shipping, "Delivery",
-                      item.itemDelivery ?? "N/A"),
-                  _buildIconRow(
-                      Icons.date_range, "Date", formatDate(item.itemDate)),
-                  _buildIconRow(
-                      Icons.verified_user, "Name", item.userName ?? "No name"),
-                  if (phone.isNotEmpty)
-                    _buildIconRow(Icons.phone, "Phone", phone),
-
-                  const SizedBox(height: 12),
-
-                  // Action buttons row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: phone.isNotEmpty
-                            ? () => _launchDialer(phone)
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          // backgroundColor: Colors.green.shade600,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                        icon: const Icon(Icons.call),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.black45,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
-                      IconButton(
-                        onPressed: phone.isNotEmpty
-                            ? () => _launchWhatsApp(phone)
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          // backgroundColor: Colors.teal,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                        icon: const Icon(Icons.chat),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Item Details Content
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.itemName ?? "No Name",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                      IconButton(
-                        onPressed: () {
-                          if (widget.user.userId == item.userId) {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content:
-                                  Text("You cannot send messages to yourself."),
-                            ));
-                          } else {
-                            _showMessagePopup(
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        _buildChip(Icons.price_change, "RM ${item.itemPrice}"),
+                        _buildChip(
+                            Icons.confirmation_number, "Qty: ${item.itemQty}"),
+                        _buildChip(
+                            Icons.local_shipping, item.itemDelivery ?? "N/A"),
+                        _buildChip(Icons.verified, item.itemStatus ?? "N/A"),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildInfoRow(
+                        Icons.description, "Description", item.itemDesc ?? "-"),
+                    _buildInfoRow(
+                        Icons.date_range, "Date", formatDate(item.itemDate)),
+                    _buildInfoRow(
+                        Icons.verified_user, "Seller", item.userName ?? "-"),
+                    _buildInfoRow(
+                        Icons.school, "University", item.userUniversity ?? "-"),
+                    if (phone.isNotEmpty)
+                      _buildInfoRow(Icons.phone, "Phone", phone),
+
+                    const SizedBox(height: 16),
+
+                    // Action Buttons Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.call, color: Colors.green),
+                          onPressed: () => _launchDialer(phone),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.chat, color: Colors.teal),
+                          onPressed: () => _launchWhatsApp(phone),
+                        ),
+                        IconButton(
+                          icon:
+                              const Icon(Icons.email, color: Colors.deepPurple),
+                          onPressed: () {
+                            if (widget.user.userId == item.userId) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "You cannot send messages to yourself.")),
+                              );
+                            } else {
+                              _showMessagePopup(
                                 item.userId.toString(),
                                 widget.user.userId.toString(),
                                 item.itemId.toString(),
-                                item.itemName.toString());
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          // backgroundColor: Colors.grey,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                                item.itemName.toString(),
+                              );
+                            }
+                          },
                         ),
-                        icon: const Icon(Icons.email),
-                      ),
-                    ],
-                  )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.amber.shade800),
+          const SizedBox(width: 10),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+                children: [
+                  TextSpan(
+                      text: "$label: ",
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: value),
                 ],
               ),
             ),
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChip(IconData icon, String label) {
+    return Chip(
+      avatar: Icon(icon, size: 16, color: Colors.white),
+      label: Text(label, style: const TextStyle(color: Colors.white)),
+      backgroundColor: Colors.purple.shade600,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     );
   }
 
@@ -531,9 +592,7 @@ class _MainScreenState extends State<MainScreen> {
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       if (jsonResponse['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Message sent."),
-        ));
+        showMessageSentPopup(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Failed to send: ${jsonResponse['message']}"),
@@ -544,5 +603,36 @@ class _MainScreenState extends State<MainScreen> {
         content: Text("Failed to send message."),
       ));
     }
+  }
+
+  void showMessageSentPopup(BuildContext context) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 50,
+        left: MediaQuery.of(context).size.width * 0.2,
+        right: MediaQuery.of(context).size.width * 0.2,
+        child: Material(
+          elevation: 8,
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.green.shade600,
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Center(
+              child: Text(
+                "Message sent",
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
   }
 }

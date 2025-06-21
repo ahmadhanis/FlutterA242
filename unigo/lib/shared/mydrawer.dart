@@ -125,8 +125,7 @@ class _MyDrawerState extends State<MyDrawer> {
             onTap: () {
               if (widget.user.userId == "0") {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content:
-                      Text("Please register/login an account to add items."),
+                  content: Text("Please register/login use this feature."),
                 ));
                 Navigator.push(
                   context,
@@ -169,41 +168,52 @@ class _MyDrawerState extends State<MyDrawer> {
             leading: const Icon(Icons.logout),
             title: const Text("Logout"),
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text("Confirm Logout"),
-                  content: const Text("Are you sure you want to logout?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context), // Cancel
-                      child: const Text("Cancel"),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        // Clear SharedPreferences
-                        SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        await prefs.remove('email');
-                        await prefs.remove('pass');
-                        await prefs.remove('remember');
+              if (widget.user.userId == "0") {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Please register/login an account."),
+                ));
+                Navigator.push(
+                  context,
+                  AnimatedRoute.slideFromRight(const LoginScreen()),
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Confirm Logout"),
+                    content: const Text(
+                        "Are you sure you want to logout? Your credentials will be cleared."),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context), // Cancel
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          // Clear SharedPreferences
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          await prefs.remove('email');
+                          await prefs.remove('pass');
+                          await prefs.remove('remember');
 
-                        // Close dialog
-                        Navigator.pop(context);
+                          // Close dialog
+                          Navigator.pop(context);
 
-                        // Navigate to LoginScreen
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          AnimatedRoute.slideFromRight(const LoginScreen()),
-                          (route) => false,
-                        );
-                      },
-                      child: const Text("Logout",
-                          style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
-                ),
-              );
+                          // Navigate to LoginScreen
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            AnimatedRoute.slideFromRight(const LoginScreen()),
+                            (route) => false,
+                          );
+                        },
+                        child: const Text("Logout",
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
+              }
             },
           )
         ],

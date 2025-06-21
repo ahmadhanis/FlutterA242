@@ -1,0 +1,2 @@
+C:/Users/USER/Documents/GitHub/FlutterA242/unigo/android/app/.cxx/RelWithDebInfo/3gk5j594/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/USER/Documents/GitHub/FlutterA242/unigo/android/app/.cxx/RelWithDebInfo/3gk5j594/x86_64/CMakeFiles/rebuild_cache.dir

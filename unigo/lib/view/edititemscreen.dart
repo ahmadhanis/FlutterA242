@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
@@ -233,7 +234,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       if (kIsWeb) webImageBytes = await pickedFile.readAsBytes();
-      setState(() {});
+      cropImage();
     }
   }
 
@@ -248,7 +249,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       if (kIsWeb) webImageBytes = await pickedFile.readAsBytes();
-      setState(() {});
+      cropImage();
     }
   }
 
@@ -314,5 +315,28 @@ class _EditItemScreenState extends State<EditItemScreen> {
       content: Text(message),
       backgroundColor: color,
     ));
+  }
+
+  Future<void> cropImage() async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: _image!.path,
+      aspectRatio: const CropAspectRatio(ratioX: 5, ratioY: 3),
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Please Crop Your Image',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      File imageFile = File(croppedFile.path);
+      _image = imageFile;
+      setState(() {});
+    }
   }
 }
