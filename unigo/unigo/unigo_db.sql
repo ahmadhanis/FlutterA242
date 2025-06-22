@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 20, 2025 at 06:24 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: Jun 22, 2025 at 02:57 PM
+-- Server version: 10.3.39-MariaDB-cll-lve
+-- PHP Version: 8.1.32
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `unigo_db`
+-- Database: `slumber6_unigodb`
 --
 
 -- --------------------------------------------------------
@@ -32,7 +32,7 @@ CREATE TABLE `tbl_items` (
   `user_id` varchar(5) NOT NULL,
   `item_name` varchar(100) NOT NULL,
   `item_desc` varchar(500) NOT NULL,
-  `item_status` varchar(10) NOT NULL,
+  `item_status` varchar(15) NOT NULL,
   `item_qty` int(3) NOT NULL,
   `item_price` float NOT NULL,
   `item_delivery` varchar(20) NOT NULL,
@@ -56,23 +56,25 @@ INSERT INTO `tbl_items` (`item_id`, `user_id`, `item_name`, `item_desc`, `item_s
 (11, '1', 'Bluetooth Speaker', 'High quality wireless speaker with bass boost.', 'New', 10, 89.9, 'Postage', '2025-06-20 09:35:08.716711'),
 (12, '9', 'Office Chair', 'Ergonomic mesh back office chair.', 'Used', 2, 120, 'Pickup', '2025-06-20 09:35:08.716711'),
 (13, '3', 'Smartphone Case', 'Shockproof silicone case for Android.', 'New', 15, 19.9, 'Postage', '2025-06-20 09:35:08.716711'),
-(14, '10', 'LED Monitor 24 inch', 'Full HD LED monitor with HDMI input.', 'Refurbishe', 3, 299, 'Pickup', '2025-06-20 09:35:08.716711'),
+(14, '10', 'LED Monitor 24 inch', 'Full HD LED monitor with HDMI input.', 'Refurbished', 3, 299, 'Pickup', '2025-06-20 09:35:08.716711'),
 (15, '7', 'Headphones', 'Wired over-ear noise-cancelling headphones.', 'Damaged', 1, 35, 'Postage', '2025-06-20 09:35:08.716711'),
 (16, '5', 'Study Desk', 'Wooden desk with drawers and cable management.', 'Used', 1, 150, 'Pickup', '2025-06-20 09:35:08.716711'),
 (17, '4', 'Wireless Mouse', '2.4GHz optical mouse with USB dongle.', 'New', 20, 29, 'Postage', '2025-06-20 09:35:08.716711'),
 (18, '8', 'Keyboard', 'Mechanical RGB keyboard.', 'New', 5, 150, 'Postage', '2025-06-20 09:35:08.716711'),
-(19, '10', 'Printer', 'Inkjet printer with wireless printing feature.', 'Refurbishe', 2, 230, 'Pickup', '2025-06-20 09:35:08.716711'),
+(19, '10', 'Printer', 'Inkjet printer with wireless printing feature.', 'Refurbished', 2, 230, 'Pickup', '2025-06-20 09:35:08.716711'),
 (20, '3', 'Lamp', 'Adjustable LED study lamp.', 'New', 8, 45, 'Postage', '2025-06-20 09:35:08.716711'),
 (21, '5', 'Bookshelf', '5-tier wooden bookshelf.', 'Used', 1, 80, 'Pickup', '2025-06-20 09:35:08.716711'),
 (22, '9', 'USB Flash Drive', '32GB USB 3.0 drive.', 'New', 25, 25, 'Postage', '2025-06-20 09:35:08.716711'),
 (23, '1', 'Laptop Bag', 'Water-resistant backpack for laptops up to 15.6”.', 'New', 12, 65, 'Postage', '2025-06-20 09:35:08.716711'),
-(24, '4', 'Router', 'Dual band Wi-Fi router.', 'Refurbishe', 3, 99, 'Postage', '2025-06-20 09:35:08.716711'),
+(24, '4', 'Router', 'Dual band Wi-Fi router.', 'Refurbished', 3, 99, 'Postage', '2025-06-20 09:35:08.716711'),
 (25, '6', 'Gaming Chair', 'Reclining chair with lumbar support.', 'Used', 1, 250, 'Pickup', '2025-06-20 09:35:08.716711'),
 (26, '8', 'Fan', 'Portable USB-powered fan.', 'New', 10, 15, 'Postage', '2025-06-20 09:35:08.716711'),
 (27, '7', 'Whiteboard', 'Magnetic dry-erase whiteboard.', 'Damaged', 1, 40, 'Pickup', '2025-06-20 09:35:08.716711'),
-(28, '2', 'Projector', 'Mini portable projector for presentations.', 'Refurbishe', 2, 320, 'Pickup', '2025-06-20 09:35:08.716711'),
+(28, '2', 'Projector', 'Mini portable projector for presentations.', 'Refurbished', 2, 320, 'Pickup', '2025-06-20 09:35:08.716711'),
 (29, '5', 'Extension Cord', '4-socket surge protector.', 'New', 10, 18, 'Postage', '2025-06-20 09:35:08.716711'),
-(30, '10', 'Table Clock', 'Analog clock with alarm.', 'Used', 4, 22, 'Postage', '2025-06-20 09:35:08.716711');
+(30, '10', 'Table Clock', 'Analog clock with alarm.', 'Used', 4, 22, 'Postage', '2025-06-20 09:35:08.716711'),
+(31, '2', 'Book Rack', 'used for 3 years', 'Used', 1, 20, 'Pickup', '2025-06-21 18:39:06.719383'),
+(32, '2', 'Nintendo switch', '3 years old still working like new. comes with botw game.', 'Used', 1, 850, 'Pickup', '2025-06-21 19:10:25.437901');
 
 -- --------------------------------------------------------
 
@@ -100,7 +102,9 @@ INSERT INTO `tbl_messages` (`message_id`, `sender_id`, `receiver_id`, `message`,
 (2, 10, 2, 'Enquiry for product: \n\nyes still available', NULL, NULL, '2025-06-20 10:52:10', 0),
 (3, 10, 2, '\n\nmeetup?', NULL, NULL, '2025-06-20 10:53:38', 1),
 (4, 2, 10, 'Printer\n\nHi is this new?', NULL, NULL, '2025-06-20 11:44:05', 1),
-(5, 2, 3, 'Lamp\n\nNew or old', NULL, NULL, '2025-06-20 11:44:27', 1);
+(5, 2, 3, 'Lamp\n\nNew or old', NULL, NULL, '2025-06-20 11:44:27', 1),
+(6, 2, 9, 'Office Chair\n\nI\'m interested with this chair.', NULL, NULL, '2025-06-21 16:34:38', 1),
+(7, 2, 3, 'Smartphone Case\n\nada lagi?', NULL, NULL, '2025-06-21 18:04:25', 1);
 
 -- --------------------------------------------------------
 
@@ -116,37 +120,40 @@ CREATE TABLE `tbl_users` (
   `user_phone` varchar(20) NOT NULL,
   `user_university` varchar(50) NOT NULL,
   `user_address` varchar(300) NOT NULL,
-  `user_datereg` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+  `user_datereg` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `otp` varchar(10) DEFAULT NULL,
+  `otp_generated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_users`
 --
 
-INSERT INTO `tbl_users` (`user_id`, `user_name`, `user_email`, `user_password`, `user_phone`, `user_university`, `user_address`, `user_datereg`) VALUES
-(2, 'Ahmad Hanis', 'slumberjer@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0195929107', 'UUM', 'Sintok', '2025-05-15 13:11:34.296275'),
-(3, 'Ali', 'ali@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '01947554443', 'UMS', 'Samarahan', '2025-05-15 13:12:24.530083'),
-(4, 'Abu', 'abu@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0194755555', 'UTM', 'Skudai', '2025-05-15 13:16:12.234566'),
-(5, 'Ahmad Faiz', 'faiz.ahmad@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0123456789', 'UUM', 'No 12, Taman Maju, Jitra, Kedah', '2025-06-20 09:49:34.043598'),
-(6, 'Nur Aisyah', 'aisyah.nur@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0112345678', 'USM', '45 Jalan Sentosa, Georgetown, Pulau Pinang', '2025-06-20 09:49:34.043598'),
-(7, 'Muhammad Amir', 'amir.muhd@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0198765432', 'UM', '89 Taman Bukit, Bangsar, Kuala Lumpur', '2025-06-20 09:49:34.043598'),
-(8, 'Siti Zulaikha', 'zulaikha.siti@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0173332211', 'UPM', '21 Lorong Angsana, Serdang, Selangor', '2025-06-20 09:49:34.043598'),
-(9, 'Muhammad Hafiz', 'hafiz.mhd@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0139988776', 'UITM', '7 Jalan Kemboja, Seksyen 7, Shah Alam', '2025-06-20 09:49:34.043598'),
-(10, 'Ainul Mardhiah', 'ainul.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0162323232', 'UKM', '33 Taman Impian, Bangi, Selangor', '2025-06-20 09:49:34.043598'),
-(11, 'Mohd Danish', 'danish.mohd@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0187878787', 'UIA', '56 Jalan Damai, Gombak, Selangor', '2025-06-20 09:49:34.043598'),
-(12, 'Nurul Huda', 'huda.nurul@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0141212121', 'UTM', '99 Taman Skudai, Johor Bahru, Johor', '2025-06-20 09:49:34.043598'),
-(13, 'Adam Harith', 'adam.harith@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0191010101', 'UNIMAS', '65 Jalan Matang, Kuching, Sarawak', '2025-06-20 09:49:34.043598'),
-(14, 'Alya Batrisyia', 'alya.batrisyia@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0129898989', 'UNIMAP', '13 Taman Perlis Indah, Arau, Perlis', '2025-06-20 09:49:34.043598'),
-(15, 'Mohamad Iqbal', 'iqbal.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0177774444', 'UTHM', '23 Jalan Universiti, Batu Pahat, Johor', '2025-06-20 09:49:34.043598'),
-(16, 'Amirah Sofea', 'amirah.s@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0181818181', 'UCSI', '31 Jalan Cheras, Kuala Lumpur', '2025-06-20 09:49:34.043598'),
-(17, 'Mohd Zikri', 'zikri.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0131313131', 'MMU', '52 Jalan Cyber 5, Cyberjaya, Selangor', '2025-06-20 09:49:34.043598'),
-(18, 'Fatimah Zahra', 'fatimah.z@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0192929292', 'MSU', '66 Jalan Kristal, Seksyen 7, Shah Alam', '2025-06-20 09:49:34.043598'),
-(19, 'Mohd Arif', 'arif.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0122323232', 'INTI', '40 Taman Bukit, Nilai, Negeri Sembilan', '2025-06-20 09:49:34.043598'),
-(20, 'Balqis Imani', 'balqis.i@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0171234567', 'HELP', '55 Jalan Damansara, Kuala Lumpur', '2025-06-20 09:49:34.043598'),
-(21, 'Aiman Syahmi', 'aiman.syahmi@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0193232323', 'TAYLORS', '71 Persiaran Subang, Subang Jaya, Selangor', '2025-06-20 09:49:34.043598'),
-(22, 'Nurin Afiqah', 'nurin.afiqah@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0185656565', 'SEGI', '88 Jalan Teknologi, Kota Damansara, Selangor', '2025-06-20 09:49:34.043598'),
-(23, 'Hakim Azhar', 'hakim.azhar@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0147878787', 'KDU', '18 Lorong Gurney, George Town, Pulau Pinang', '2025-06-20 09:49:34.043598'),
-(24, 'Sabrina Alia', 'sabrina.alia@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0166767676', 'UM', '91 Taman Tun Dr Ismail, Kuala Lumpur', '2025-06-20 09:49:34.043598');
+INSERT INTO `tbl_users` (`user_id`, `user_name`, `user_email`, `user_password`, `user_phone`, `user_university`, `user_address`, `user_datereg`, `otp`, `otp_generated_at`) VALUES
+(2, 'Ahmad Hanis', 'slumberjer@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0195929107', 'TAYLORS', 'Sintok', '2025-05-15 13:11:34.296275', '395360', '2025-06-21 13:31:02'),
+(3, 'Ali', 'ali@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '01947554443', 'UMS', 'Samarahan', '2025-05-15 13:12:24.530083', NULL, NULL),
+(4, 'Abu', 'abu@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0194755555', 'UTM', 'Skudai', '2025-05-15 13:16:12.234566', NULL, NULL),
+(5, 'Ahmad Faiz', 'faiz.ahmad@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0123456789', 'UUM', 'No 12, Taman Maju, Jitra, Kedah', '2025-06-20 09:49:34.043598', NULL, NULL),
+(6, 'Nur Aisyah', 'aisyah.nur@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0112345678', 'USM', '45 Jalan Sentosa, Georgetown, Pulau Pinang', '2025-06-20 09:49:34.043598', NULL, NULL),
+(7, 'Muhammad Amir', 'amir.muhd@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0198765432', 'UM', '89 Taman Bukit, Bangsar, Kuala Lumpur', '2025-06-20 09:49:34.043598', NULL, NULL),
+(8, 'Siti Zulaikha', 'zulaikha.siti@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0173332211', 'UPM', '21 Lorong Angsana, Serdang, Selangor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(9, 'Muhammad Hafiz', 'hafiz.mhd@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0139988776', 'UITM', '7 Jalan Kemboja, Seksyen 7, Shah Alam', '2025-06-20 09:49:34.043598', NULL, NULL),
+(10, 'Ainul Mardhiah', 'ainul.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0162323232', 'UKM', '33 Taman Impian, Bangi, Selangor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(11, 'Mohd Danish', 'danish.mohd@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0187878787', 'UIA', '56 Jalan Damai, Gombak, Selangor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(12, 'Nurul Huda', 'huda.nurul@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0141212121', 'UTM', '99 Taman Skudai, Johor Bahru, Johor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(13, 'Adam Harith', 'adam.harith@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0191010101', 'UNIMAS', '65 Jalan Matang, Kuching, Sarawak', '2025-06-20 09:49:34.043598', NULL, NULL),
+(14, 'Alya Batrisyia', 'alya.batrisyia@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0129898989', 'UNIMAP', '13 Taman Perlis Indah, Arau, Perlis', '2025-06-20 09:49:34.043598', NULL, NULL),
+(15, 'Mohamad Iqbal', 'iqbal.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0177774444', 'UTHM', '23 Jalan Universiti, Batu Pahat, Johor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(16, 'Amirah Sofea', 'amirah.s@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0181818181', 'UCSI', '31 Jalan Cheras, Kuala Lumpur', '2025-06-20 09:49:34.043598', NULL, NULL),
+(17, 'Mohd Zikri', 'zikri.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0131313131', 'MMU', '52 Jalan Cyber 5, Cyberjaya, Selangor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(18, 'Fatimah Zahra', 'fatimah.z@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0192929292', 'MSU', '66 Jalan Kristal, Seksyen 7, Shah Alam', '2025-06-20 09:49:34.043598', NULL, NULL),
+(19, 'Mohd Arif', 'arif.m@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0122323232', 'INTI', '40 Taman Bukit, Nilai, Negeri Sembilan', '2025-06-20 09:49:34.043598', NULL, NULL),
+(20, 'Balqis Imani', 'balqis.i@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0171234567', 'HELP', '55 Jalan Damansara, Kuala Lumpur', '2025-06-20 09:49:34.043598', NULL, NULL),
+(21, 'Aiman Syahmi', 'aiman.syahmi@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0193232323', 'TAYLORS', '71 Persiaran Subang, Subang Jaya, Selangor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(22, 'Nurin Afiqah', 'nurin.afiqah@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0185656565', 'SEGI', '88 Jalan Teknologi, Kota Damansara, Selangor', '2025-06-20 09:49:34.043598', NULL, NULL),
+(23, 'Hakim Azhar', 'hakim.azhar@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0147878787', 'KDU', '18 Lorong Gurney, George Town, Pulau Pinang', '2025-06-20 09:49:34.043598', NULL, NULL),
+(24, 'Sabrina Alia', 'sabrina.alia@email.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0166767676', 'UM', '91 Taman Tun Dr Ismail, Kuala Lumpur', '2025-06-20 09:49:34.043598', NULL, NULL),
+(25, 'Hannes', 'ahmadhanis@uum.edu.my', '4061c2ee636f985a548b64734e5cbb406ce6953b', '0194702493', 'UUM', '30, 02600 Arau, Perlis', '2025-06-21 22:29:37.079632', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -182,19 +189,19 @@ ALTER TABLE `tbl_users`
 -- AUTO_INCREMENT for table `tbl_items`
 --
 ALTER TABLE `tbl_items`
-  MODIFY `item_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `item_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `tbl_messages`
 --
 ALTER TABLE `tbl_messages`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tbl_users`
 --
 ALTER TABLE `tbl_users`
-  MODIFY `user_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `user_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- Constraints for dumped tables

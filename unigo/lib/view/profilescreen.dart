@@ -21,9 +21,31 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late String name, phone, address;
+  late String name, phone, address, university;
   File? _image;
   Uint8List? webImageBytes;
+
+  final List<String> unilist = [
+    "UUM",
+    "USM",
+    "UIA",
+    "UM",
+    "UTM",
+    "UPM",
+    "UKM",
+    "UITM",
+    "UNIMAS",
+    "UNIMAP",
+    "UTHM",
+    "UCSI",
+    "MMU",
+    "MSU",
+    "INTI",
+    "HELP",
+    "TAYLORS",
+    "SEGI",
+    "KDU",
+  ];
 
   @override
   void initState() {
@@ -31,6 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     name = widget.user.userName ?? '-';
     phone = widget.user.userPhone ?? '-';
     address = widget.user.userAddress ?? '-';
+    university = widget.user.userUniversity ?? '';
   }
 
   @override
@@ -80,9 +103,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  user.userUniversity ?? 'No University',
-                  style: const TextStyle(color: Colors.grey),
+                _editableTile(
+                  Icons.school,
+                  "University",
+                  university,
+                  () {
+                    _showUniversityPicker();
+                  },
                 ),
                 const Divider(height: 30, thickness: 1),
                 _editableTile(
@@ -109,6 +136,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showUniversityPicker() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Select University"),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 300,
+            child: ListView.builder(
+              itemCount: unilist.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(unilist[index]),
+                  onTap: () {
+                    setState(() {
+                      university = unilist[index];
+                      updateProfile();
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -196,6 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         "phone": phone,
         "address": address,
         "image": base64Image,
+        "university": university
       },
     );
 
@@ -206,6 +264,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           content: Text("Profile updated successfully"),
           backgroundColor: Colors.green,
         ));
+        setState(() {
+          widget.user.userName = name;
+          widget.user.userPhone = phone;
+          widget.user.userAddress = address;
+          widget.user.userUniversity = university;
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Update failed. Please try again."),

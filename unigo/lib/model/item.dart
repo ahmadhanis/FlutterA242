@@ -54,7 +54,7 @@ class Item {
     data['item_date'] = itemDate;
     data['user_name'] = userName;
     data['user_phone'] = userPhone;
-    data['university_name'] = userUniversity;
+    data['user_university'] = userUniversity;
     return data;
   }
 }

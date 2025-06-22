@@ -2,10 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:unigo/shared/db_helper.dart';
 import 'package:unigo/view/splashscreen.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await DBHelper.instance.database; // Ensures db and table created
 }
 
 class MyApp extends StatelessWidget {

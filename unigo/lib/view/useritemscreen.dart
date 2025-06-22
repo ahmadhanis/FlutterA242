@@ -47,7 +47,48 @@ class _UserItemScreenState extends State<UserItemScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: itemList.isEmpty
-          ? const Center(child: Text("No items found."))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inbox, size: 80, color: Colors.grey.shade400),
+                  const SizedBox(height: 16),
+                  Text(
+                    "No items found.",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "You haven't listed any items yet.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // Navigate to item creation screen, e.g., Navigator.push(...)
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add Your First Item"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple.shade600,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )
           : ListView.builder(
               itemCount: itemList.length,
               itemBuilder: (context, index) {

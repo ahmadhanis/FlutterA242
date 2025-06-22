@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unigo/model/user.dart';
 import 'package:unigo/shared/animated_route.dart';
 import 'package:unigo/shared/myconfig.dart';
+import 'package:unigo/view/favscreen.dart';
 import 'package:unigo/view/loginscreen.dart';
 import 'package:unigo/view/mainscreen.dart';
 import 'package:unigo/view/messagescreen.dart';
@@ -117,6 +118,17 @@ class _MyDrawerState extends State<MyDrawer> {
                       UserItemScreen(user: widget.user)),
                 );
               }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.favorite),
+            title: const Text("Your Favorites"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                AnimatedRoute.slideFromRight(FavScreen(user: widget.user)),
+              );
             },
           ),
           ListTile(

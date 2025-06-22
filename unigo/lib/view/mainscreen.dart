@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
+import 'package:unigo/shared/db_helper.dart';
 import 'package:unigo/shared/myconfig.dart';
 import 'package:unigo/shared/mydrawer.dart';
 import 'package:unigo/view/newitemscreen.dart';
@@ -172,8 +173,22 @@ class _MainScreenState extends State<MainScreen> {
                                                   fontSize: 16,
                                                   color:
                                                       Colors.purple.shade600)),
-                                          Text("Price: RM ${item.itemPrice}"),
-                                          Text("Qty: ${item.itemQty}"),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  "Price: RM ${item.itemPrice}"),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              const Text("|"),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              Text("Qty: ${item.itemQty}"),
+                                            ],
+                                          ),
                                           Text(
                                               "Delivery: ${item.itemDelivery}"),
                                           Text(
@@ -182,6 +197,15 @@ class _MainScreenState extends State<MainScreen> {
                                               "Date: ${formatDate(item.itemDate)}"),
                                         ],
                                       ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.add,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {
+                                        addtoFavDialog(item);
+                                      },
                                     ),
                                   ],
                                 ),
@@ -634,5 +658,51 @@ class _MainScreenState extends State<MainScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       overlayEntry.remove();
     });
+  }
+
+  void addtoFavDialog(Item item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Add to Favorites"),
+        content: const Text(
+            "Are you sure you want to add this item to your favorites?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              addtoFav(item);
+              Navigator.of(context).pop();
+            },
+            child: const Text("Add"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> addtoFav(Item item) async {
+    final db = await DBHelper.instance.database;
+
+    final existing = await db.query(
+      'tbl_items',
+      where: 'item_id = ? AND user_id = ?',
+      whereArgs: [item.itemId, item.userId],
+    );
+
+    if (existing.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Item already in favorites.")),
+      );
+      return;
+    }
+
+    await db.insert('tbl_items', item.toJson());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Item added to favorites.")),
+    );
   }
 }
