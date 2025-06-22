@@ -125,7 +125,7 @@ class _MyDrawerState extends State<MyDrawer> {
             title: const Text("Your Favorites"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 AnimatedRoute.slideFromRight(FavScreen(user: widget.user)),
               );

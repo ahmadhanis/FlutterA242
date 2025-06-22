@@ -8,9 +8,11 @@ import 'package:intl/intl.dart';
 import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:unigo/shared/animated_route.dart';
 import 'package:unigo/shared/myconfig.dart';
 import 'package:unigo/shared/mydrawer.dart';
 import 'package:unigo/view/edititemscreen.dart';
+import 'package:unigo/view/newitemscreen.dart';
 
 class UserItemScreen extends StatefulWidget {
   final User user;
@@ -73,6 +75,11 @@ class _UserItemScreenState extends State<UserItemScreen> {
                   ElevatedButton.icon(
                     onPressed: () {
                       // Navigate to item creation screen, e.g., Navigator.push(...)
+                      Navigator.push(
+                        context,
+                        AnimatedRoute.slideFromRight(
+                            NewItemScreen(user: widget.user)),
+                      );
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Add Your First Item"),
