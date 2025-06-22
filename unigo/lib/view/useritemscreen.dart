@@ -73,13 +73,14 @@ class _UserItemScreenState extends State<UserItemScreen> {
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       // Navigate to item creation screen, e.g., Navigator.push(...)
-                      Navigator.push(
+                      await Navigator.push(
                         context,
                         AnimatedRoute.slideFromRight(
                             NewItemScreen(user: widget.user)),
                       );
+                      loadUserItems();
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Add Your First Item"),
