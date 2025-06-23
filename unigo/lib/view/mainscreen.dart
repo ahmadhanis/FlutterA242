@@ -152,8 +152,8 @@ class _MainScreenState extends State<MainScreen> {
                                       borderRadius: BorderRadius.circular(6),
                                       child: Image.network(
                                         imageUrl,
-                                        width: 120,
-                                        height: 120,
+                                        width: screenWidth * 0.2,
+                                        height: screenHeight * 0.15,
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) =>
@@ -161,13 +161,15 @@ class _MainScreenState extends State<MainScreen> {
                                                     size: 80),
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(item.itemName ?? "No name",
+                                          Text(
+                                              truncateString(
+                                                  item.itemName.toString(), 15),
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
@@ -180,11 +182,13 @@ class _MainScreenState extends State<MainScreen> {
                                               Text(
                                                   "Price: RM ${item.itemPrice}"),
                                               const SizedBox(
-                                                width: 20,
+                                                width: 3,
                                               ),
-                                              const Text("|"),
+                                              const Text("|",
+                                                  style: TextStyle(
+                                                      color: Colors.red)),
                                               const SizedBox(
-                                                width: 20,
+                                                width: 3,
                                               ),
                                               Text("Qty: ${item.itemQty}"),
                                             ],
@@ -265,6 +269,15 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  String truncateString(String str, int length) {
+    if (str.length > length) {
+      str = str.substring(0, length);
+      return "$str...";
+    } else {
+      return str;
+    }
+  }
+
   void loadItems(String s) {
     setState(() {
       isLoading = true; // show loading bar
@@ -318,119 +331,121 @@ class _MainScreenState extends State<MainScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Top Image Banner
-              Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 3 / 2,
-                    child: Image.network(
-                      imageUrl,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Center(
-                          child: Icon(Icons.broken_image, size: 60),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.black45,
-                      child: IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // Item Details Content
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top Image Banner
+                Stack(
                   children: [
-                    Text(
-                      item.itemName ?? "No Name",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                    AspectRatio(
+                      aspectRatio: 3 / 2,
+                      child: Image.network(
+                        imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey.shade200,
+                          child: const Center(
+                            child: Icon(Icons.broken_image, size: 60),
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        _buildChip(Icons.price_change, "RM ${item.itemPrice}"),
-                        _buildChip(
-                            Icons.confirmation_number, "Qty: ${item.itemQty}"),
-                        _buildChip(
-                            Icons.local_shipping, item.itemDelivery ?? "N/A"),
-                        _buildChip(Icons.verified, item.itemStatus ?? "N/A"),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _buildInfoRow(
-                        Icons.description, "Description", item.itemDesc ?? "-"),
-                    _buildInfoRow(
-                        Icons.date_range, "Date", formatDate(item.itemDate)),
-                    _buildInfoRow(
-                        Icons.verified_user, "Seller", item.userName ?? "-"),
-                    _buildInfoRow(
-                        Icons.school, "University", item.userUniversity ?? "-"),
-                    if (phone.isNotEmpty)
-                      _buildInfoRow(Icons.phone, "Phone", phone),
-
-                    const SizedBox(height: 16),
-
-                    // Action Buttons Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.call, color: Colors.green),
-                          onPressed: () => _launchDialer(phone),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.black45,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Navigator.of(context).pop(),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.chat, color: Colors.teal),
-                          onPressed: () => _launchWhatsApp(phone),
-                        ),
-                        IconButton(
-                          icon:
-                              const Icon(Icons.email, color: Colors.deepPurple),
-                          onPressed: () {
-                            if (widget.user.userId == item.userId) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        "You cannot send messages to yourself.")),
-                              );
-                            } else {
-                              _showMessagePopup(
-                                item.userId.toString(),
-                                widget.user.userId.toString(),
-                                item.itemId.toString(),
-                                item.itemName.toString(),
-                              );
-                            }
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
+            
+                // Item Details Content
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.itemName ?? "No Name",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 2,
+                        children: [
+                          _buildChip(Icons.price_change, "RM ${item.itemPrice}"),
+                          _buildChip(
+                              Icons.confirmation_number, "Qty: ${item.itemQty}"),
+                          _buildChip(
+                              Icons.local_shipping, item.itemDelivery ?? "N/A"),
+                          _buildChip(Icons.verified, item.itemStatus ?? "N/A"),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      _buildInfoRow(
+                          Icons.description, "Description", item.itemDesc ?? "-"),
+                      _buildInfoRow(
+                          Icons.date_range, "Date", formatDate(item.itemDate)),
+                      _buildInfoRow(
+                          Icons.verified_user, "Seller", item.userName ?? "-"),
+                      _buildInfoRow(
+                          Icons.school, "University", item.userUniversity ?? "-"),
+                      if (phone.isNotEmpty)
+                        _buildInfoRow(Icons.phone, "Phone", phone),
+                                  
+                      const SizedBox(height: 4),
+                                  
+                      // Action Buttons Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.call, color: Colors.green),
+                            onPressed: () => _launchDialer(phone),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.chat, color: Colors.teal),
+                            onPressed: () => _launchWhatsApp(phone),
+                          ),
+                          IconButton(
+                            icon:
+                                const Icon(Icons.email, color: Colors.deepPurple),
+                            onPressed: () {
+                              if (widget.user.userId == item.userId) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          "You cannot send messages to yourself.")),
+                                );
+                              } else {
+                                _showMessagePopup(
+                                  item.userId.toString(),
+                                  widget.user.userId.toString(),
+                                  item.itemId.toString(),
+                                  item.itemName.toString(),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

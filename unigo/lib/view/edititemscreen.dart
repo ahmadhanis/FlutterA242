@@ -121,7 +121,8 @@ class _EditItemScreenState extends State<EditItemScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(
+                      Flexible(
+                        flex: 2,
                         child: DropdownButtonFormField<String>(
                           value: itemStatus,
                           decoration: const InputDecoration(
@@ -136,7 +137,8 @@ class _EditItemScreenState extends State<EditItemScreen> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Expanded(
+                      Flexible(
+                        flex: 1,
                         child: DropdownButtonFormField<String>(
                           value: itemQty,
                           decoration: const InputDecoration(
