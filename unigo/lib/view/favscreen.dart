@@ -1,13 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:unigo/model/item.dart';
 import 'package:unigo/model/user.dart';
 import 'package:unigo/shared/db_helper.dart';
@@ -25,7 +21,7 @@ class FavScreen extends StatefulWidget {
 
 class _FavScreenState extends State<FavScreen> {
   List<Item> favItems = [];
-
+  late double screenWidth, screenHeight;
   @override
   void initState() {
     super.initState();
@@ -34,6 +30,8 @@ class _FavScreenState extends State<FavScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(title: const Text("My Favorites")),
       body: Column(
@@ -94,8 +92,8 @@ class _FavScreenState extends State<FavScreen> {
                                   borderRadius: BorderRadius.circular(6),
                                   child: Image.network(
                                     imageUrl,
-                                    width: 120,
-                                    height: 120,
+                                    width: screenWidth * 0.2,
+                                    height: screenHeight * 0.12,
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
@@ -109,10 +107,12 @@ class _FavScreenState extends State<FavScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(item.itemName.toString(),
+                                      Text(
+                                          truncateString(
+                                              item.itemName.toString(), 15),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 16,
+                                            fontSize: 14,
                                             color: Colors.purple.shade600,
                                           )),
                                       Row(
@@ -120,25 +120,27 @@ class _FavScreenState extends State<FavScreen> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text("Price: RM ${item.itemPrice}"),
-                                          const SizedBox(width: 20),
+                                          const SizedBox(width: 5),
                                           const Text("|"),
-                                          const SizedBox(width: 20),
-                                          Text("Qty: ${item.itemQty}"),
+                                          const SizedBox(width: 5),
+                                          Text("${item.itemQty}"),
                                         ],
                                       ),
                                       Text("Delivery: ${item.itemDelivery}"),
                                       Text("Uni: ${(item.userUniversity)}"),
-                                      Text(
-                                          "Date: ${formatDate(item.itemDate)}"),
+                                      // Text(
+                                      //     "Date: ${formatDate(item.itemDate)}"),
                                     ],
                                   ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () {
+                                GestureDetector(
+                                  onTap: () {
                                     deleteDataDialog(item, context);
                                   },
+                                  child: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ],
                             ),
@@ -151,19 +153,19 @@ class _FavScreenState extends State<FavScreen> {
         ],
       ),
       drawer: MyDrawer(user: widget.user),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            Directory documentsDirectory =
-                await getApplicationDocumentsDirectory();
-            String dbPath = join(documentsDirectory.path, 'item_fav.db');
+      // floatingActionButton: FloatingActionButton(
+      //     onPressed: () async {
+      //       Directory documentsDirectory =
+      //           await getApplicationDocumentsDirectory();
+      //       String dbPath = join(documentsDirectory.path, 'item_fav.db');
 
-            bool dbExists = await File(dbPath).exists();
+      //       bool dbExists = await File(dbPath).exists();
 
-            if (dbExists) {
-              await deleteDatabase(dbPath);
-            } else {}
-          },
-          child: const Icon(Icons.add)),
+      //       if (dbExists) {
+      //         await deleteDatabase(dbPath);
+      //       } else {}
+      //     },
+      //     child: const Icon(Icons.add)),
     );
   }
 
@@ -174,6 +176,15 @@ class _FavScreenState extends State<FavScreen> {
       return DateFormat("dd/MM/yyyy").format(dateTime);
     } catch (e) {
       return rawDate;
+    }
+  }
+
+  String truncateString(String str, int length) {
+    if (str.length > length) {
+      str = str.substring(0, length);
+      return "$str...";
+    } else {
+      return str;
     }
   }
 

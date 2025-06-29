@@ -24,7 +24,7 @@ class UserItemScreen extends StatefulWidget {
 
 class _UserItemScreenState extends State<UserItemScreen> {
   List<Item> itemList = <Item>[]; // List of item objects
-
+  late double screenWidth, screenHeight;
   @override
   void initState() {
     super.initState();
@@ -33,6 +33,8 @@ class _UserItemScreenState extends State<UserItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.user.userName.toString()} Items'),
@@ -120,8 +122,8 @@ class _UserItemScreenState extends State<UserItemScreen> {
                             borderRadius: BorderRadius.circular(6),
                             child: Image.network(
                               imageUrl,
-                              width: 120,
-                              height: 120,
+                              width: screenWidth * 0.2,
+                              height: screenHeight * 0.13,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   const Icon(Icons.broken_image, size: 80),
@@ -135,14 +137,18 @@ class _UserItemScreenState extends State<UserItemScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item.itemName ?? "No name",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
+                                Text(
+                                    truncateString(
+                                        item.itemName.toString(), 15),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Colors.purple.shade600,
+                                    )),
                                 Text("Price: RM ${item.itemPrice}"),
                                 Text("Qty: ${item.itemQty}"),
                                 Text("Delivery: ${item.itemDelivery}"),
-                                Text("Date: ${formatDate(item.itemDate)}"),
+                                // Text("Date: ${formatDate(item.itemDate)}"),
                               ],
                             ),
                           ),
@@ -188,6 +194,15 @@ class _UserItemScreenState extends State<UserItemScreen> {
             ),
       drawer: MyDrawer(user: widget.user),
     );
+  }
+
+  String truncateString(String str, int length) {
+    if (str.length > length) {
+      str = str.substring(0, length);
+      return "$str...";
+    } else {
+      return str;
+    }
   }
 
   String formatDate(String? rawDate) {

@@ -121,7 +121,8 @@ class _EditItemScreenState extends State<EditItemScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(
+                      Flexible(
+                        flex: 2,
                         child: DropdownButtonFormField<String>(
                           value: itemStatus,
                           decoration: const InputDecoration(
@@ -136,7 +137,8 @@ class _EditItemScreenState extends State<EditItemScreen> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Expanded(
+                      Flexible(
+                        flex: 1,
                         child: DropdownButtonFormField<String>(
                           value: itemQty,
                           decoration: const InputDecoration(
@@ -278,6 +280,14 @@ class _EditItemScreenState extends State<EditItemScreen> {
     );
   }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+  /// Updates an existing item by sending a POST request to the server with the
+  /// updated item details. This includes the item ID, name, description, status,
+  /// quantity, image (converted to base64), user ID, delivery method, and price.
+  /// If the update is successful, a success message is shown and the current
+  /// screen is closed. Otherwise, an error message is displayed.
+
+/*******  da7ea6e9-aa44-4564-9b0a-0c91ca71a9f7  *******/
   void updateItem() async {
     String base64Image =
         _image != null ? base64Encode(_image!.readAsBytesSync()) : "NA";

@@ -145,16 +145,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       const Text("Remember Me"),
                                       const Spacer(),
-                                      TextButton(
-                                        onPressed: () {
-                                          forgotPasswordDialog(context);
-                                        },
-                                        child: Text(
-                                          "Forgot Password?",
-                                          style: TextStyle(
-                                              color: Colors.purple.shade600),
-                                        ),
-                                      )
                                     ],
                                   ),
                                 ]),
@@ -195,6 +185,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
+                            TextButton(
+                              onPressed: () {
+                                forgotPasswordDialog(context);
+                              },
+                              child: Text(
+                                "Forgot Password?",
+                                style: TextStyle(color: Colors.purple.shade600),
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -208,7 +207,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         AnimatedRoute.slideFromRight(const RegisterScreen()),
                       );
                     },
-                    child: const Text("Don't have an account? Register here"),
+                    child: const Text(
+                      "Don't have an account? Register here",
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -229,6 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: const Text("Guest Mode"),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

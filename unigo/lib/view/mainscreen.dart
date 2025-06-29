@@ -152,8 +152,8 @@ class _MainScreenState extends State<MainScreen> {
                                       borderRadius: BorderRadius.circular(6),
                                       child: Image.network(
                                         imageUrl,
-                                        width: 120,
-                                        height: 120,
+                                        width: screenWidth * 0.2,
+                                        height: screenHeight * 0.14,
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) =>
@@ -167,10 +167,12 @@ class _MainScreenState extends State<MainScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(item.itemName ?? "No name",
+                                          Text(
+                                              truncateString(
+                                                  item.itemName.toString(), 15),
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                   color:
                                                       Colors.purple.shade600)),
                                           Row(
@@ -178,34 +180,39 @@ class _MainScreenState extends State<MainScreen> {
                                                 MainAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  "Price: RM ${item.itemPrice}"),
+                                                  "Price/Qty: RM ${item.itemPrice}"),
                                               const SizedBox(
-                                                width: 20,
+                                                width: 5,
                                               ),
-                                              const Text("|"),
+                                              const Text(
+                                                "|",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.red),
+                                              ),
                                               const SizedBox(
-                                                width: 20,
+                                                width: 5,
                                               ),
-                                              Text("Qty: ${item.itemQty}"),
+                                              Text("${item.itemQty}"),
                                             ],
                                           ),
                                           Text(
                                               "Delivery: ${item.itemDelivery}"),
                                           Text(
                                               "Uni: ${(item.userUniversity ?? "N/A").toUpperCase()}"),
-                                          Text(
-                                              "Date: ${formatDate(item.itemDate)}"),
+                                          // Text(
+                                          //     "Date: ${formatDate(item.itemDate)}"),
                                         ],
                                       ),
                                     ),
-                                    IconButton(
-                                      icon: const Icon(
+                                    GestureDetector(
+                                      onTap: () {
+                                        addtoFavDialog(item);
+                                      },
+                                      child: const Icon(
                                         Icons.add,
                                         color: Colors.red,
                                       ),
-                                      onPressed: () {
-                                        addtoFavDialog(item);
-                                      },
                                     ),
                                   ],
                                 ),
@@ -265,6 +272,15 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  String truncateString(String str, int length) {
+    if (str.length > length) {
+      str = str.substring(0, length);
+      return "$str...";
+    } else {
+      return str;
+    }
+  }
+
   void loadItems(String s) {
     setState(() {
       isLoading = true; // show loading bar
@@ -273,7 +289,7 @@ class _MainScreenState extends State<MainScreen> {
         .get(Uri.parse(
             "${MyConfig.myurl}/unigo/php/load_items.php?search=$s&pageno=$curpage"))
         .then((response) {
-      log(response.body);
+      // log(response.body);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['status'] == 'success') {
